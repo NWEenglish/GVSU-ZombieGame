@@ -1,0 +1,29 @@
+-- Sprites --
+Animated Top Down Survivor Player - rileygombart - https://opengameart.org/content/animated-top-down-survivor-player
+Ground Tiles - Kemono - https://opengameart.org/content/ground-tiles-1 -- REMOVE
+Castle/Dungeon 2 - Gary Shaw - https://opengameart.org/content/castle-dungeon-2
+Ground Tileset // Grass & Sand // - chabull - https://opengameart.org/content/ground-tileset-grass-sand
+Water - qubodup - https://opengameart.org/node/10593
+2D Top Down Highway Background - Alucard - https://opengameart.org/content/2d-top-down-highway-background
+Tank set 2 - clayster2012 - https://opengameart.org/content/tank-set-2
+Bullet - oglsdl - https://opengameart.org/content/bullet-symbol
+Zombie2 - Carlos Alface - https://opengameart.org/content/zombie-2
+Zombie News - OrbitStudios, Fernando Ferreira - https://opengameart.org/content/zombie-news-in-radio
+Pistol - gamedevshirious - https://opengameart.org/content/pixel-pistol
+Pixel Art 2D Weapons Pack - Cayden Franklin - https://opengameart.org/content/pixel-art-2d-weapons-pack
+Lasergun - Vaceslav Kreller (John2k) - https://opengameart.org/content/lasergun
+
+-- AI Library --
+NavMeshPlus - h8man - https://github.com/h8man/NavMeshPlus
+
+-- Audio --
+Shots - Michel Baradari (Submitted by qubodup) - https://opengameart.org/content/chaingun-pistol-rifle-shotgun-shots
+Dark Loop - Machine - https://opengameart.org/content/crypt
+Day 1 - copyc4t (Paolo D'Emilio) - https://opengameart.org/content/day-1-cinematic-transition-sound
+Reload - zer0_sol - https://opengameart.org/content/handgun-reload-sound-effect
+Zombie Moans 01 - EmoPreben - https://opengameart.org/content/zombie-moans-01-by-emopreben
+Zombie News - OrbitStudios, Fernando Ferreira - https://opengameart.org/content/zombie-news-in-radio
+Menu_4 - Alexandr Zhelanov - https://soundcloud.com/alexandr-zhelanov
+Key Pickup 2 - Vinrax - https://opengameart.org/content/key-pickup-2
+Remix of Metaruka's "The End" - AVGVSTA - https://opengameart.org/content/the-end-death-screen-mix
+Laser shot - Gumichan01 - https://opengameart.org/content/laser-shot
