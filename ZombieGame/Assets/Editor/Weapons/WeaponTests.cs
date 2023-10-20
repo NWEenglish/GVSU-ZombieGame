@@ -37,7 +37,7 @@ namespace Assets.Editor.Weapons
 
     internal class WeaponTest : Weapon
     {
-        public WeaponTest (int clipSize, int ammoInClip, int remainingAmmo)
+        public WeaponTest(int clipSize, int ammoInClip, int remainingAmmo)
         {
             AmmoClipSize = clipSize;
             AmmoClip = ammoInClip;
@@ -62,7 +62,7 @@ namespace Assets.Editor.Weapons
             throw new NotImplementedException();
         }
 
-        public override void PurchaseAmmo(ref int Points, StoreHelper store)
+        public override void PurchaseAmmo(ref int Points, BaseStore store)
         {
             throw new NotImplementedException();
         }
