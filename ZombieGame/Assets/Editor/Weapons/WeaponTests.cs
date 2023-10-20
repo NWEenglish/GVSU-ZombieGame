@@ -50,7 +50,7 @@ namespace Assets.Editor.Weapons
         public override int AmmoClipSize { get; protected set; }
         public override AudioSource ReloadSound { get; protected set; }
         public override Sprite Sprite { get; protected set; }
-        public override WeaponType Type { get; protected set; }
+        public override WeaponType Type => WeaponType.Pistol;
 
         public override bool CanShoot()
         {
