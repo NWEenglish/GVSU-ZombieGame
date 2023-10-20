@@ -37,7 +37,7 @@ namespace Assets.Scripts.Weapons
             Type = WeaponType.Pistol;
         }
 
-        public override void PurchaseAmmo(ref int Points, StoreHelper store)
+        public override void PurchaseAmmo(ref int Points, BaseStore store)
         {
             if (store.Type == Type)
             {

@@ -10,9 +10,7 @@
 
         public const string GameLogic = "General Game Logic";
         public const string SpawnerHolder = "Spawner Holder";
-        public const string StorePistol = "Pistol Store";
-        public const string StoreRifle = "Rifle Store";
-        public const string StoreLaser = "Laser Store";
+        public const string Store = "Store";
 
         public const string Player = "Player";
         public const string PlayerPistol = "Player With Pistol";

@@ -44,14 +44,14 @@ namespace Assets.Scripts.Player
             Points += points;
         }
 
-        public void HandleAmmoPurchase(Weapon weapon, StoreHelper store)
+        public void HandleAmmoPurchase(Weapon weapon, BaseStore store)
         {
             int points = Points;
             weapon.PurchaseAmmo(ref points, store);
             Points = points;
         }
 
-        public Weapon HandleWeaponPurchase(StoreHelper store)
+        public Weapon HandleWeaponPurchase(BaseStore store)
         {
             int points = Points;
             Weapon weapon = store.PurchaseWeapon(ref points);

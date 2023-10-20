@@ -44,7 +44,7 @@ namespace Assets.Scripts.Weapons
             return LastShot.AddMilliseconds(TimeBetweenShotsInMS) <= DateTime.Now;
         }
 
-        public override void PurchaseAmmo(ref int Points, StoreHelper store)
+        public override void PurchaseAmmo(ref int Points, BaseStore store)
         {
             if (store.Type == Type)
             {

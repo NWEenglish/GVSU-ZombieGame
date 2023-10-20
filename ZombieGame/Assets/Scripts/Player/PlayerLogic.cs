@@ -15,9 +15,9 @@ namespace Assets.Scripts.Player
     public class PlayerLogic : MonoBehaviour
     {
         public PlayerStatus Status { get; private set; }
-        
+
         private Rigidbody2D Body;
-        private StoreHelper CurrentStore;
+        private BaseStore CurrentStore;
         private Weapon CurrentWeapon;
         private List<Weapon> Weapons;
         private AmmoHUD AmmoHUD;
@@ -86,23 +86,15 @@ namespace Assets.Scripts.Player
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.StorePistol))
+            if (collision.name.Contains(ObjectNames.Store))
             {
-                CurrentStore = collision.GetComponent<PistolStore>().Store;
-            }
-            else if (collision.name.Contains(ObjectNames.StoreRifle))
-            {
-                CurrentStore = collision.GetComponent<RifleStore>().Store;
-            }
-            else if (collision.name.Contains(ObjectNames.StoreLaser))
-            {
-                CurrentStore = collision.GetComponent<LaserStore>().Store;
+                CurrentStore = collision.GetComponent<BaseStore>();
             }
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.StorePistol) || collision.name.Contains(ObjectNames.StoreRifle))
+            if (collision.name.Contains(ObjectNames.Store))
             {
                 CurrentStore = null;
             }

@@ -11,13 +11,13 @@ namespace Assets.Scripts.Weapons
         public abstract int AmmoClipSize { get; protected set; }
         public abstract AudioSource ReloadSound { get; protected set; }
         public abstract Sprite Sprite { get; protected set; }
-        public abstract WeaponType Type { get; protected set;  }
+        public abstract WeaponType Type { get; protected set; }
 
         public abstract bool IsReloading();
         public abstract bool CanShoot();
         public abstract void Shoot(float angle);
-        public abstract void PurchaseAmmo(ref int Points, StoreHelper store);
-        
+        public abstract void PurchaseAmmo(ref int Points, BaseStore store);
+
         public void Reload()
         {
             if (AmmoClip != AmmoClipSize && RemainingAmmo > 0 && !ReloadSound.isPlaying)
