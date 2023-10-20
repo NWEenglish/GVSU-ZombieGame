@@ -4,18 +4,23 @@ using UnityEngine;
 
 namespace Assets.Scripts.Stores
 {
-    public class BaseStore : MonoBehaviour
+    public abstract class BaseStore : MonoBehaviour
     {
+        public abstract int CostToBuy { get; }
+        public abstract int CostForAmmo { get; }
+        public abstract int AmmoReplenish { get; }
+        public abstract WeaponType Type { get; }
+
         public StoreHelper Store { get; private set; }
 
         private TextMesh TextMesh;
         private AudioSource AmmoPurchaseSound;
 
-        protected void OnStart(int costToBuy, int costForAmmo, int ammoReplenish, WeaponType weaponType)
+        private void Start()
         {
             AmmoPurchaseSound = gameObject.GetComponent<AudioSource>();
 
-            Store = new StoreHelper(costToBuy, costForAmmo, ammoReplenish, AmmoPurchaseSound, weaponType);
+            Store = new StoreHelper(CostToBuy, CostForAmmo, AmmoReplenish, AmmoPurchaseSound, Type);
 
             TextMesh = gameObject.GetComponentInChildren<TextMesh>();
             TextMesh.color = Color.clear;
