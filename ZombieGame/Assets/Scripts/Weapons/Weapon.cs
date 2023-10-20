@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Stores;
 using UnityEngine;
 
@@ -11,9 +11,9 @@ namespace Assets.Scripts.Weapons
         public abstract int AmmoClipSize { get; protected set; }
         public abstract AudioSource ReloadSound { get; protected set; }
         public abstract Sprite Sprite { get; protected set; }
-        public abstract WeaponType Type { get; protected set; }
+        public abstract WeaponType Type { get; }
 
-        public abstract bool IsReloading();
+        public bool IsReloading() => ReloadSound.isPlaying;
         public abstract bool CanShoot();
         public abstract void Shoot(float angle);
         public abstract void PurchaseAmmo(ref int Points, BaseStore store);

@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.Stores;
 using UnityEngine;
@@ -19,9 +19,8 @@ namespace Assets.Scripts.Weapons
         public override int AmmoClipSize { get; protected set; }
         public override AudioSource ReloadSound { get; protected set; }
         public override Sprite Sprite { get; protected set; }
-        public override WeaponType Type { get; protected set; }
+        public override WeaponType Type => WeaponType.Pistol;
 
-        public override bool IsReloading() => ReloadSound.isPlaying;
         public override bool CanShoot() => true;
 
         public PistolWeapon(GameObject bullet, GameObject muzzle, AudioSource reloadSound, Sprite sprite)
@@ -34,7 +33,6 @@ namespace Assets.Scripts.Weapons
             AmmoClipSize = ClipSize;
             AmmoClip = AmmoClipSize;
             RemainingAmmo = StartingAmmo;
-            Type = WeaponType.Pistol;
         }
 
         public override void PurchaseAmmo(ref int Points, BaseStore store)

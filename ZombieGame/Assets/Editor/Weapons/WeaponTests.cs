@@ -57,11 +57,6 @@ namespace Assets.Editor.Weapons
             throw new NotImplementedException();
         }
 
-        public override bool IsReloading()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void PurchaseAmmo(ref int Points, BaseStore store)
         {
             throw new NotImplementedException();

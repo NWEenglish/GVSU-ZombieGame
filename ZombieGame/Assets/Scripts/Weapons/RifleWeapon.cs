@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.Stores;
@@ -22,9 +22,7 @@ namespace Assets.Scripts.Weapons
         public override int AmmoClipSize { get; protected set; }
         public override AudioSource ReloadSound { get; protected set; }
         public override Sprite Sprite { get; protected set; }
-        public override WeaponType Type { get; protected set; }
-
-        public override bool IsReloading() => ReloadSound.isPlaying;
+        public override WeaponType Type => WeaponType.Rifle;
 
         public RifleWeapon(GameObject bullet, GameObject muzzle, AudioSource reloadSound, Sprite sprite)
         {
@@ -36,7 +34,6 @@ namespace Assets.Scripts.Weapons
             AmmoClipSize = ClipSize;
             AmmoClip = AmmoClipSize;
             RemainingAmmo = StartingAmmo;
-            Type = WeaponType.Rifle;
         }
 
         public override bool CanShoot()
