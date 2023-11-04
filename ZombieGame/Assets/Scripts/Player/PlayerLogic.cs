@@ -18,8 +18,8 @@ namespace Assets.Scripts.Player
 
         private Rigidbody2D Body;
         private BaseStore CurrentStore;
-        private Weapon CurrentWeapon;
-        private List<Weapon> Weapons;
+        private BaseWeapon CurrentWeapon;
+        private List<BaseWeapon> Weapons;
         private AmmoHUD AmmoHUD;
         private HealthHUD HealthHUD;
         private PointsHUD PointsHUD;
@@ -50,7 +50,7 @@ namespace Assets.Scripts.Player
             var healthBlink = new BlinkHelper(GameObject.Find(ObjectNames.Health_Indicator_HUD).GetComponent<Image>(), Color.red, HealthBlinkTime);
             HealthHUD = new HealthHUD(GameObject.Find(ObjectNames.Health_Panel_HUD).GetComponent<Image>(), healthBlink, Status.MaxHealth);
 
-            Weapons = new List<Weapon>()
+            Weapons = new List<BaseWeapon>()
             {
                 GameObject.Find(ObjectNames.Pistol).GetComponent<PlayerPistol>().Weapon
             };
@@ -79,7 +79,7 @@ namespace Assets.Scripts.Player
             ReloadLogic();
 
             Status.Update(IsMoving, IsSprinting);
-            AmmoHUD.UpdateHUD(CurrentWeapon.AmmoClip, CurrentWeapon.RemainingAmmo);
+            AmmoHUD.UpdateHUD(CurrentWeapon.RemainingClipAmmo, CurrentWeapon.RemainingTotalAmmo);
             HealthHUD.UpdateHUD(Status.Health);
             PointsHUD.UpdateHUD(Status.Points);
         }

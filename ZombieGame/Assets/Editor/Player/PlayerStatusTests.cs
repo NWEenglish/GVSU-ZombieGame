@@ -119,7 +119,7 @@ namespace Assets.Editor.Player
         {
             // Arrange
             PlayerStatus playerStatus = new();
-            List<int> points = new List<int>()
+            List<int> points = new()
             {
                 25,
                 50,
@@ -144,7 +144,7 @@ namespace Assets.Editor.Player
         public void HandleAmmoPurchaseTests(int startingPoints, int expectedPoints, int expectedAmmo)
         {
             // Arrange
-            Weapon weapon = new PistolWeapon(null, null, null, null);
+            BaseWeapon weapon = new PistolWeapon(null, null, null, null);
 
             var gameObject = new GameObject();
             gameObject.AddComponent<PistolStore>();
@@ -158,7 +158,7 @@ namespace Assets.Editor.Player
 
             // Assert
             Assert.AreEqual(expectedPoints, playerStatus.Points);
-            Assert.AreEqual(expectedAmmo, weapon.RemainingAmmo);
+            Assert.AreEqual(expectedAmmo, weapon.RemainingTotalAmmo);
         }
 
         private static IEnumerable<TestCaseData> AwardPointsTestCases()
@@ -170,7 +170,7 @@ namespace Assets.Editor.Player
             yield return new TestCaseData(int.MinValue).Returns(int.MinValue);
         }
 
-        private Weapon GetWeapon()
+        private BaseWeapon GetWeapon()
         {
             return new PistolWeapon(null, null, null, null);
         }
