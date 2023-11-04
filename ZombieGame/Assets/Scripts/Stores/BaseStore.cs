@@ -20,42 +20,38 @@ namespace Assets.Scripts.Stores
 
         public int BuyAmmo(ref int Points)
         {
-            if (Points < CostForAmmo)
-            {
-                return 0;
-            }
-            else
+            int ammoBought = 0;
+
+            if (Points >= CostForAmmo)
             {
                 Points -= CostForAmmo;
                 PurchaseSound.TryPlay();
 
-                return AmmoReplenish;
+                ammoBought = AmmoReplenish;
             }
+
+            return ammoBought;
         }
 
-        public Weapon PurchaseWeapon(ref int Points)
+        public BaseWeapon PurchaseWeapon(ref int Points)
         {
-            if (Points < CostToBuy)
-            {
-                return null;
-            }
-            else
+            BaseWeapon weaponBought = null;
+
+            if (Points >= CostToBuy)
             {
                 Points -= CostToBuy;
                 PurchaseSound.TryPlay();
 
-                switch (Type)
+                weaponBought = Type switch
                 {
-                    case WeaponType.Pistol:
-                        return GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<PlayerPistol>().Weapon; // TODO: These player objects will need a base class, then this can be shrunk 
-                    case WeaponType.Rifle:
-                        return GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<PlayerRifle>().Weapon;
-                    case WeaponType.Laser:
-                        return GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<PlayerLaser>().Weapon;
-                    default:
-                        throw new NotImplementedException();
-                }
+                    WeaponType.Pistol => GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<PlayerPistol>().Weapon,// TODO: These player objects will need a base class, then this can be shrunk 
+                    WeaponType.Rifle => GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<PlayerRifle>().Weapon,
+                    WeaponType.Laser => GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<PlayerLaser>().Weapon,
+                    _ => throw new NotImplementedException(),
+                };
             }
+
+            return weaponBought;
         }
 
         private void Start()
