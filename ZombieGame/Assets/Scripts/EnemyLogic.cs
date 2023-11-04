@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Player;
 using UnityEngine;
@@ -155,7 +156,7 @@ namespace Assets.Scripts
             if (target != null && Vector2.Distance(target.position, gameObject.transform.position) <= AudioRange)
             {
                 int randomValue = (int)((Random.value * 100) % AudioSources.Count);
-                AudioSources[randomValue].Play();
+                AudioSources[randomValue].TryPlay();
             }
             SetNextAudioPlayTime();
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Extensions;
 using TMPro;
 using UnityEngine;
 
@@ -66,7 +67,7 @@ namespace Assets.Scripts.GeneralGameLogic
             }
             else if (RoundPlayedMusicForLast != Wave)
             {
-                RoundOverMusic.Play();
+                RoundOverMusic.TryPlay();
                 RoundPlayedMusicForLast = Wave;
                 Wave_HUD.color = Color.black;
             }
@@ -131,7 +132,7 @@ namespace Assets.Scripts.GeneralGameLogic
             {
                 int randomValue = (int)((Random.value * 100) % Spawners.Count);
                 spawner = Spawners[randomValue];
-                
+
                 if (!spawner.CanSpawn)
                 {
                     spawner = null;

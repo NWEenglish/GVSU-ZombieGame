@@ -1,6 +1,7 @@
 using System;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.Player;
 using Assets.Scripts.Weapons;
 using UnityEngine;
@@ -26,7 +27,7 @@ namespace Assets.Scripts.Stores
             else
             {
                 Points -= CostForAmmo;
-                PurchaseSound.Play();
+                PurchaseSound.TryPlay();
 
                 return AmmoReplenish;
             }
@@ -41,7 +42,7 @@ namespace Assets.Scripts.Stores
             else
             {
                 Points -= CostToBuy;
-                PurchaseSound.Play();
+                PurchaseSound.TryPlay();
 
                 switch (Type)
                 {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.Helpers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,7 +25,7 @@ namespace Assets.Scripts.MainMenu
             IsFirstFadeCall = true;
 
             AudioSources = gameObject.GetComponents<AudioSource>().ToList();
-            AudioSources[0].Play();
+            AudioSources[0].TryPlay();
         }
 
         private void Update()
@@ -39,7 +40,7 @@ namespace Assets.Scripts.MainMenu
 
                 if (!AudioSources[1].isPlaying)
                 {
-                    AudioSources[1].Play();
+                    AudioSources[1].TryPlay();
                     AudioSources[1].loop = true;
                 }
             }

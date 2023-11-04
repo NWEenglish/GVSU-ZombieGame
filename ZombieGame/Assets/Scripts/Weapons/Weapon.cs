@@ -1,4 +1,5 @@
 using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.Stores;
 using UnityEngine;
 
@@ -27,7 +28,7 @@ namespace Assets.Scripts.Weapons
                     RemainingAmmo--;
                     AmmoClip++;
                 }
-                ReloadSound.Play();
+                ReloadSound.TryPlay();
             }
         }
 

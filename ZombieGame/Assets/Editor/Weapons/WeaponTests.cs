@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Assets.Editor.Weapons
 {
-    public class WeaponTests
+    public class WeaponTests // TODO -  Rewrite?
     {
         [TestCaseSource(nameof(ReloadTestCases))]
         public void ReloadTests(int ammoInClip, int remainingAmmo, int expectedAmmoInClip, int expectedRemainingAmmo)

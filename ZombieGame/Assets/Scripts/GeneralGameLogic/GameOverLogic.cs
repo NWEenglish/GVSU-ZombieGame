@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Assets.Scripts.Constants.Names;
+﻿using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,7 +24,7 @@ namespace Assets.Scripts.GeneralGameLogic
             if (Player.Status.IsPlayerDead && !InGameOver)
             {
                 InGameOver = true;
-                GameOverMusic.Play();
+                GameOverMusic.TryPlay();
             }
             else if (Player.Status.IsPlayerDead && !GameOverMusic.isPlaying)
             {
