@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Constants.Types;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.HUD;
@@ -183,12 +184,12 @@ namespace Assets.Scripts.Player
 
         private void ShootUpdate()
         {
-            if (Input.GetMouseButton(0) && CurrentWeapon.GetType() == typeof(RifleWeapon))
+            if (Input.GetMouseButton(0) && CurrentWeapon.FireType == FireType.FullyAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
                 CurrentWeapon.Shoot(bulletTargetAngle);
             }
-            else if (Input.GetMouseButtonDown(0))
+            else if (Input.GetMouseButtonDown(0) && CurrentWeapon.FireType == FireType.SemiAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
                 CurrentWeapon.Shoot(bulletTargetAngle);

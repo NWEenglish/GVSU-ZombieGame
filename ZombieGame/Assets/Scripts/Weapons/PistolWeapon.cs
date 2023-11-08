@@ -10,6 +10,7 @@ namespace Assets.Scripts.Weapons
         public override int StartingAmmo => 200;
         public override double TimeBetweenShotsInMS => 0;
         public override WeaponType Type => WeaponType.Pistol;
+        public override FireType FireType => FireType.SemiAutomatic;
 
         public PistolWeapon(GameObject bullet, GameObject muzzle, AudioSource reloadSound, Sprite sprite)
             : base(bullet, muzzle, reloadSound, sprite)

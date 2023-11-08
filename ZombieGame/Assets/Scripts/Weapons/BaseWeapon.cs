@@ -14,6 +14,7 @@ namespace Assets.Scripts.Weapons
         public abstract int StartingAmmo { get; }
         public abstract double TimeBetweenShotsInMS { get; }
         public abstract WeaponType Type { get; }
+        public abstract FireType FireType { get; }
 
         public int RemainingClipAmmo { get; private set; }
         public int RemainingTotalAmmo { get; private set; }

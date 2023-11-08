@@ -10,6 +10,7 @@ namespace Assets.Scripts.Weapons
         public override int StartingAmmo => 25;
         public override double TimeBetweenShotsInMS => 500;
         public override WeaponType Type => WeaponType.Laser;
+        public override FireType FireType => FireType.SemiAutomatic;
 
         public LaserWeapon(GameObject bullet, GameObject muzzle, AudioSource reloadSound, Sprite sprite)
             : base(bullet, muzzle, reloadSound, sprite)
