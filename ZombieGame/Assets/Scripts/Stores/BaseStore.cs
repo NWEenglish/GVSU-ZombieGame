@@ -41,14 +41,7 @@ namespace Assets.Scripts.Stores
             {
                 Points -= CostToBuy;
                 PurchaseSound.TryPlay();
-
-                weaponBought = Type switch
-                {
-                    WeaponType.Pistol => GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<PlayerPistol>().Weapon,// TODO: These player objects will need a base class, then this can be shrunk 
-                    WeaponType.Rifle => GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<PlayerRifle>().Weapon,
-                    WeaponType.Laser => GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<PlayerLaser>().Weapon,
-                    _ => throw new NotImplementedException(),
-                };
+                weaponBought = GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<BasePlayer>().Weapon;
             }
 
             return weaponBought;
