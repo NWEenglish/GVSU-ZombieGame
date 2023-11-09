@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
@@ -76,7 +76,7 @@ namespace Assets.Scripts
                 Destroy(gameObject);
             }
 
-            if (System.DateTime.Now > NextAudioTime && AudioSources.Any(a => !a.isPlaying))
+            if (DateTime.Now > NextAudioTime && AudioSources.Any(a => !a.isPlaying))
             {
                 PlayAudio();
             }
