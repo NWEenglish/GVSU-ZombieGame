@@ -97,9 +97,7 @@ namespace Assets.Scripts
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            string collisionName = collision.collider.name;
-
-            if (collisionName.Contains(ObjectNames.Bullet) || collisionName.Contains(ObjectNames.Beam))
+            if (collision.gameObject.HasComponent<BulletLogic>())
             {
                 Health -= collision.gameObject.GetComponent<BulletLogic>().Damage;
 
@@ -116,7 +114,7 @@ namespace Assets.Scripts
                     }
                 }
             }
-            else if (collisionName.Contains(ObjectNames.Player) && IsAttacking)
+            else if (collision.gameObject.HasComponent<PlayerLogic>() && IsAttacking)
             {
                 collision.gameObject.GetComponent<PlayerLogic>().Hit();
                 AttackHitState();

@@ -1,5 +1,4 @@
 using System;
-using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
 using Assets.Scripts.Player;
@@ -58,7 +57,7 @@ namespace Assets.Scripts.Stores
 
         private void OnTriggerStay2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.Player))
+            if (collision.gameObject.HasComponent<PlayerLogic>())
             {
                 TextMesh.color = Color.yellow;
             }
@@ -66,7 +65,7 @@ namespace Assets.Scripts.Stores
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.Player))
+            if (collision.gameObject.HasComponent<PlayerLogic>())
             {
                 TextMesh.color = Color.clear;
             }

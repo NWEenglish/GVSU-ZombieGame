@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.HUD;
@@ -87,7 +88,7 @@ namespace Assets.Scripts.Player
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.Store))
+            if (collision.gameObject.HasComponent<BaseStore>())
             {
                 CurrentStore = collision.GetComponent<BaseStore>();
             }
@@ -95,7 +96,7 @@ namespace Assets.Scripts.Player
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.Store))
+            if (collision.gameObject.HasComponent<BaseStore>())
             {
                 CurrentStore = null;
             }
