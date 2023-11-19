@@ -4,6 +4,7 @@ using Assets.Scripts.Extensions;
 using Assets.Scripts.Player;
 using Assets.Scripts.Weapons;
 using UnityEngine;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.Stores
 {
@@ -16,6 +17,7 @@ namespace Assets.Scripts.Stores
 
         private TextMesh TextMesh;
         private AudioSource PurchaseSound;
+        private readonly Logger _logger = Logger.GetLogger();
 
         public int BuyAmmo(ref int Points)
         {
@@ -27,6 +29,11 @@ namespace Assets.Scripts.Stores
                 PurchaseSound.TryPlay();
 
                 ammoBought = AmmoReplenish;
+                _logger.LogDebug($"Player has purchased ammo. | CostForAmmo: {CostForAmmo} | RemainingTotalPoints: {Points} | AmountOfAmmoBought: {ammoBought}");
+            }
+            else
+            {
+                _logger.LogDebug($"Player was not able to purchased ammo. | CostForAmmo: {CostForAmmo} | TotalPoints: {Points}");
             }
 
             return ammoBought;
@@ -41,6 +48,11 @@ namespace Assets.Scripts.Stores
                 Points -= CostToBuy;
                 PurchaseSound.TryPlay();
                 weaponBought = GameObject.Find(Enum.GetName(typeof(WeaponType), Type)).GetComponent<BasePlayer>().Weapon;
+                _logger.LogDebug($"Player has purchased a weapon. | CostForWeapon: {CostToBuy} | RemainingTotalPoints: {Points} | WeaponBought: {weaponBought.Type}");
+            }
+            else
+            {
+                _logger.LogDebug($"Player was not able to purchased a weapon. | CostForAmmo: {CostToBuy} | TotalPoints: {Points}");
             }
 
             return weaponBought;

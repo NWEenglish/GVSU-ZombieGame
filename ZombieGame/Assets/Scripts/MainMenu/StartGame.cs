@@ -2,11 +2,14 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.MainMenu
 {
     public class StartGame : MonoBehaviour
     {
+        private static readonly Logger _logger = Logger.GetLogger();
+
         private void Start()
         {
             Button button = gameObject.GetComponent<Button>();
@@ -15,6 +18,7 @@ namespace Assets.Scripts.MainMenu
 
         private void OnClick()
         {
+            _logger.LogDebug("Starting a new game.");
             SceneManager.LoadScene(SceneNames.Game);
         }
     }

@@ -11,6 +11,7 @@ using Assets.Scripts.Weapons;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.Player
 {
@@ -31,6 +32,7 @@ namespace Assets.Scripts.Player
         private const float PlayerSprintSpeed = PlayerWalkingSpeed * 2;
         private const float PlayerReloadSpeed = PlayerWalkingSpeed / 2;
         private const double HealthBlinkTime = 1;
+        private readonly Logger _logger = Logger.GetLogger();
 
         private float PlayerSpeed => GetPlayerSpeed();
         private float HorizontalSpeed => Input.GetAxisRaw("Horizontal") * PlayerSpeed;
@@ -108,6 +110,7 @@ namespace Assets.Scripts.Player
 
             if (Status.Health <= 0)
             {
+                _logger.LogDebug($"Player has died. | PlayerHealth: {Status.Health}");
                 Destroy(gameObject);
                 GameOverScreen.ShowGameOver(GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Wave);
             }
@@ -128,18 +131,22 @@ namespace Assets.Scripts.Player
         {
             if (IsPurchasing && CurrentStore != null)
             {
+                _logger.LogDebug($"Playing is making a purchase. | CurrentStoreName: {CurrentStore.name}");
                 if (Weapons.Any(w => w.Type == CurrentStore.Type))
                 {
+                    _logger.LogDebug($"Player is attempting to purchase ammo.");
                     Status.HandleAmmoPurchase(CurrentWeapon, CurrentStore);
                 }
                 else
                 {
+                    _logger.LogDebug($"Player is attempting to purchase a weapon.");
                     var newWeapon = Status.HandleWeaponPurchase(CurrentStore);
 
                     if (newWeapon != null)
                     {
                         if (Weapons.Count == 2)
                         {
+                            _logger.LogDebug($"Player has too many weapons. Replacing the current weapon. | CurrentWeapon: {CurrentWeapon.Type}");
                             Weapons.Remove(CurrentWeapon);
                             Weapons.Add(newWeapon);
                         }
