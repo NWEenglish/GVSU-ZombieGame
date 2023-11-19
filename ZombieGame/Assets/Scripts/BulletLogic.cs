@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Extensions;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -18,7 +19,7 @@ namespace Assets.Scripts
         private void Start()
         {
             Audio = gameObject.GetComponent<AudioSource>();
-            Audio.Play();
+            Audio.TryPlay();
 
             // Ignore bullet collision with player
             PolygonCollider2D playerCollider = GameObject.Find(ObjectNames.Player).GetComponent<PolygonCollider2D>();

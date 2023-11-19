@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Scripts.Constants.Names;
-using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Player;
 using Assets.Scripts.Stores;
 using Assets.Scripts.Weapons;
@@ -121,7 +119,7 @@ namespace Assets.Editor.Player
         {
             // Arrange
             PlayerStatus playerStatus = new();
-            List<int> points = new List<int>()
+            List<int> points = new()
             {
                 25,
                 50,
@@ -140,28 +138,27 @@ namespace Assets.Editor.Player
             Assert.AreEqual(expectedPoints, playerStatus.Points);
         }
 
-        [TestCase(100, 50, 210)] // Enough points, can afford ammo
-        [TestCase(10, 10, 200)] // Not enough points, can't afford ammo
+        [TestCase(200, 0, 250)] // Enough points, can afford ammo
+        [TestCase(100, 100, 200)] // Not enough points, can't afford ammo
         [TestCase(0, 0, 200)] // No points, can't afford to buy ammo
         public void HandleAmmoPurchaseTests(int startingPoints, int expectedPoints, int expectedAmmo)
         {
             // Arrange
-            int costToBuy = 100;
-            int costForAmmo = 50;
-            int ammoRefilled = 10;
+            BaseWeapon weapon = new PistolWeapon(null, null, null, null);
 
-            Weapon weapon = new PistolWeapon(null, null, null, null);
-            AudioSource audioSource = GameObject.Find(ObjectNames.StorePistol).GetComponent<AudioSource>();
-            StoreHelper store = new StoreHelper(costToBuy, costForAmmo, ammoRefilled, audioSource, WeaponType.Pistol);
+            var gameObject = new GameObject();
+            gameObject.AddComponent<PistolStore>();
+            gameObject.AddComponent<AudioSource>();
+
             PlayerStatus playerStatus = new();
             playerStatus.AwardPoints(startingPoints);
 
             // Act
-            playerStatus.HandleAmmoPurchase(weapon, store);            
+            playerStatus.HandleAmmoPurchase(weapon, gameObject.GetComponent<BaseStore>());
 
             // Assert
             Assert.AreEqual(expectedPoints, playerStatus.Points);
-            Assert.AreEqual(expectedAmmo, weapon.RemainingAmmo);
+            Assert.AreEqual(expectedAmmo, weapon.RemainingTotalAmmo);
         }
 
         private static IEnumerable<TestCaseData> AwardPointsTestCases()
@@ -173,7 +170,7 @@ namespace Assets.Editor.Player
             yield return new TestCaseData(int.MinValue).Returns(int.MinValue);
         }
 
-        private Weapon GetWeapon()
+        private BaseWeapon GetWeapon()
         {
             return new PistolWeapon(null, null, null, null);
         }

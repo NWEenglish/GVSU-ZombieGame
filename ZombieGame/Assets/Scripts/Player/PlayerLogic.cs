@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.HUD;
@@ -15,11 +17,11 @@ namespace Assets.Scripts.Player
     public class PlayerLogic : MonoBehaviour
     {
         public PlayerStatus Status { get; private set; }
-        
+
         private Rigidbody2D Body;
-        private StoreHelper CurrentStore;
-        private Weapon CurrentWeapon;
-        private List<Weapon> Weapons;
+        private BaseStore CurrentStore;
+        private BaseWeapon CurrentWeapon;
+        private List<BaseWeapon> Weapons;
         private AmmoHUD AmmoHUD;
         private HealthHUD HealthHUD;
         private PointsHUD PointsHUD;
@@ -50,7 +52,7 @@ namespace Assets.Scripts.Player
             var healthBlink = new BlinkHelper(GameObject.Find(ObjectNames.Health_Indicator_HUD).GetComponent<Image>(), Color.red, HealthBlinkTime);
             HealthHUD = new HealthHUD(GameObject.Find(ObjectNames.Health_Panel_HUD).GetComponent<Image>(), healthBlink, Status.MaxHealth);
 
-            Weapons = new List<Weapon>()
+            Weapons = new List<BaseWeapon>()
             {
                 GameObject.Find(ObjectNames.Pistol).GetComponent<PlayerPistol>().Weapon
             };
@@ -79,30 +81,22 @@ namespace Assets.Scripts.Player
             ReloadLogic();
 
             Status.Update(IsMoving, IsSprinting);
-            AmmoHUD.UpdateHUD(CurrentWeapon.AmmoClip, CurrentWeapon.RemainingAmmo);
+            AmmoHUD.UpdateHUD(CurrentWeapon.RemainingClipAmmo, CurrentWeapon.RemainingTotalAmmo);
             HealthHUD.UpdateHUD(Status.Health);
             PointsHUD.UpdateHUD(Status.Points);
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.StorePistol))
+            if (collision.gameObject.HasComponent<BaseStore>())
             {
-                CurrentStore = collision.GetComponent<PistolStore>().Store;
-            }
-            else if (collision.name.Contains(ObjectNames.StoreRifle))
-            {
-                CurrentStore = collision.GetComponent<RifleStore>().Store;
-            }
-            else if (collision.name.Contains(ObjectNames.StoreLaser))
-            {
-                CurrentStore = collision.GetComponent<LaserStore>().Store;
+                CurrentStore = collision.GetComponent<BaseStore>();
             }
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.StorePistol) || collision.name.Contains(ObjectNames.StoreRifle))
+            if (collision.gameObject.HasComponent<BaseStore>())
             {
                 CurrentStore = null;
             }
@@ -191,12 +185,12 @@ namespace Assets.Scripts.Player
 
         private void ShootUpdate()
         {
-            if (Input.GetMouseButton(0) && CurrentWeapon.GetType() == typeof(RifleWeapon))
+            if (Input.GetMouseButton(0) && CurrentWeapon.FireType == FireType.FullyAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
                 CurrentWeapon.Shoot(bulletTargetAngle);
             }
-            else if (Input.GetMouseButtonDown(0))
+            else if (Input.GetMouseButtonDown(0) && CurrentWeapon.FireType == FireType.SemiAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
                 CurrentWeapon.Shoot(bulletTargetAngle);

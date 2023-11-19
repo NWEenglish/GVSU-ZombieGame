@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Player;
 using UnityEngine;
@@ -75,7 +76,7 @@ namespace Assets.Scripts
                 Destroy(gameObject);
             }
 
-            if (System.DateTime.Now > NextAudioTime && AudioSources.Any(a => !a.isPlaying))
+            if (DateTime.Now > NextAudioTime && AudioSources.Any(a => !a.isPlaying))
             {
                 PlayAudio();
             }
@@ -96,9 +97,7 @@ namespace Assets.Scripts
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            string collisionName = collision.collider.name;
-
-            if (collisionName.Contains(ObjectNames.Bullet) || collisionName.Contains(ObjectNames.Beam))
+            if (collision.gameObject.HasComponent<BulletLogic>())
             {
                 Health -= collision.gameObject.GetComponent<BulletLogic>().Damage;
 
@@ -115,7 +114,7 @@ namespace Assets.Scripts
                     }
                 }
             }
-            else if (collisionName.Contains(ObjectNames.Player) && IsAttacking)
+            else if (collision.gameObject.HasComponent<PlayerLogic>() && IsAttacking)
             {
                 collision.gameObject.GetComponent<PlayerLogic>().Hit();
                 AttackHitState();
@@ -155,7 +154,7 @@ namespace Assets.Scripts
             if (target != null && Vector2.Distance(target.position, gameObject.transform.position) <= AudioRange)
             {
                 int randomValue = (int)((Random.value * 100) % AudioSources.Count);
-                AudioSources[randomValue].Play();
+                AudioSources[randomValue].TryPlay();
             }
             SetNextAudioPlayTime();
         }
