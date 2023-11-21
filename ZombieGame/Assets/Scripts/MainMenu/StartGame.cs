@@ -8,7 +8,7 @@ namespace Assets.Scripts.MainMenu
 {
     public class StartGame : MonoBehaviour
     {
-        private static readonly Logger _logger = Logger.GetLogger();
+        private readonly Logger _logger = Logger.GetLogger();
 
         private void Start()
         {
