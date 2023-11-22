@@ -9,7 +9,9 @@ namespace Assets.Scripts.Extensions
         public static bool TryPlay(this AudioSource audioSource)
         {
             bool wasPlayed = false;
-            Logger logger = Logger.GetLogger(); // If aditional extension methods created, reconsider if should be global and lazy singleton.
+
+            // If aditional extension methods are created, reconsider if should be global or still be a lazy singleton.
+            Logger logger = Logger.GetLogger();
 
             try
             {

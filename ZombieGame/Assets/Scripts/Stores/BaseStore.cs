@@ -33,7 +33,7 @@ namespace Assets.Scripts.Stores
             }
             else
             {
-                _logger.LogDebug($"Player was not able to purchased ammo. | CostForAmmo: {CostForAmmo} | TotalPoints: {Points}");
+                _logger.LogDebug($"Player was not able to purchase ammo. | CostForAmmo: {CostForAmmo} | TotalPoints: {Points}");
             }
 
             return ammoBought;
@@ -52,7 +52,7 @@ namespace Assets.Scripts.Stores
             }
             else
             {
-                _logger.LogDebug($"Player was not able to purchased a weapon. | CostForAmmo: {CostToBuy} | TotalPoints: {Points}");
+                _logger.LogDebug($"Player was not able to purchase a weapon. | CostForAmmo: {CostToBuy} | TotalPoints: {Points}");
             }
 
             return weaponBought;
