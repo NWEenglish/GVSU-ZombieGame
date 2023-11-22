@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.Extensions
 {
@@ -9,8 +10,12 @@ namespace Assets.Scripts.Extensions
         {
             bool wasPlayed = false;
 
+            // If aditional extension methods are created, reconsider if should be global or still be a lazy singleton.
+            Logger logger = Logger.GetLogger();
+
             try
             {
+                logger.LogDebug($"Attempting to play audio. | AudioSourceName: {audioSource.name}");
                 if (audioSource != null)
                 {
                     audioSource.Play();
@@ -18,7 +23,7 @@ namespace Assets.Scripts.Extensions
             }
             catch (Exception ex)
             {
-                // TODO - Logging
+                logger.LogError(ex, $"Error occurred while attempting to play audio. | AudioSourceName: {audioSource.name}");
                 wasPlayed = false;
             }
 

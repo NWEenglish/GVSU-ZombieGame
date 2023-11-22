@@ -4,6 +4,7 @@ using Assets.Scripts.Helpers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.Intro
 {
@@ -13,6 +14,7 @@ namespace Assets.Scripts.Intro
         private const int EndFadeTime = 5;
         private const int StartFadingOut = 60;
         private readonly DateTime IntroStart = DateTime.Now;
+        private readonly Logger _logger = Logger.GetLogger();
 
         private bool StartedFadeOut = false;
         private AudioSource IntroAudio;
@@ -41,6 +43,7 @@ namespace Assets.Scripts.Intro
             }
             else if (!IntroAudio.isPlaying || PlayerHitEsc)
             {
+                _logger.LogDebug($"Intro sequence over. Going to main menu. | AudioOver: {!IntroAudio.isPlaying} | PlayerHitEsc: {PlayerHitEsc}");
                 SceneManager.LoadScene(SceneNames.MainMenu);
             }
         }

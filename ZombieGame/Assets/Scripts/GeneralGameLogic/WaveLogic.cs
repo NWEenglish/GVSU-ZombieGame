@@ -4,6 +4,7 @@ using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Extensions;
 using TMPro;
 using UnityEngine;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.GeneralGameLogic
 {
@@ -13,6 +14,7 @@ namespace Assets.Scripts.GeneralGameLogic
         public int Wave { get; private set; }
         public bool ShouldSprint => CalculateShouldSprint();
 
+        private readonly Logger _logger = Logger.GetLogger();
         private const int WaitTime = 15;
         private const int TimeBetweenZombieSpawnsInMS = 750;
         private const int MaxZombiesAtOnce = 30;
@@ -61,12 +63,14 @@ namespace Assets.Scripts.GeneralGameLogic
                 AttemptSpawnZombies();
                 EndOfWave = System.DateTime.Now;
             }
+            // Once there are no more zombies and there are no more to spawn, begin next wave.
             else if (System.DateTime.Now > EndOfWave.AddSeconds(WaitTime))
             {
                 StartNextWave();
             }
             else if (RoundPlayedMusicForLast != Wave)
             {
+                _logger.LogDebug("Playing sound for start of next wave.");
                 RoundOverMusic.TryPlay();
                 RoundPlayedMusicForLast = Wave;
                 Wave_HUD.color = Color.black;
@@ -79,6 +83,8 @@ namespace Assets.Scripts.GeneralGameLogic
             Wave_HUD.text = $"Wave: {Wave}";
             Wave_HUD.color = Color.red;
             CalculateZombiesForWave();
+
+            _logger.LogDebug($"Starting the next wave. | Wave: {Wave} | ZombieCount: {RemainingZombiesToSpawn}");
         }
 
         private int CalculateHealth()

@@ -1,6 +1,7 @@
 ﻿using System;
 using Assets.Scripts.Stores;
 using Assets.Scripts.Weapons;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.Player
 {
@@ -19,6 +20,7 @@ namespace Assets.Scripts.Player
         private const int MaxEnergy = 1000;
         private const int HealthRegenTime = 200;
         private const int HealthAmountRegen = 1;
+        private readonly Logger _logger = Logger.GetLogger();
 
         public PlayerStatus()
         {
@@ -37,11 +39,13 @@ namespace Assets.Scripts.Player
         {
             Health -= 34;
             LastHealthChange = DateTime.Now;
+            _logger.LogDebug($"Player took a hit. | PlayerHealth: {Health}");
         }
 
         public void AwardPoints(int points)
         {
             Points += points;
+            _logger.LogDebug($"Player has earned points. | EarnedPoints: {points} | TotalPoints: {Points}");
         }
 
         public void HandleAmmoPurchase(BaseWeapon weapon, BaseStore store)
@@ -71,7 +75,7 @@ namespace Assets.Scripts.Player
                     Health = MaxHealth;
                 }
 
-                LastHealthChange = System.DateTime.Now;
+                LastHealthChange = DateTime.Now;
             }
         }
 
