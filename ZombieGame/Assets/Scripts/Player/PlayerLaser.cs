@@ -9,7 +9,7 @@ namespace Assets.Scripts.Player
         private BaseWeapon BaseWeapon;
 
         protected override string BulletObjectName => ObjectNames.Beam;
-        protected override string PlayerWeaponObjectName => ObjectNames.PlayerLaser;
+        protected override string PlayerWeaponObjectName => ObjectNames.HumanLaser;
 
         protected override BaseWeapon GetWeapon(GameObject bullet, GameObject muzzle, AudioSource reloadSound, Sprite sprite)
         {

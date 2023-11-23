@@ -10,9 +10,9 @@
         public const string SpawnerHolder = "Spawner Holder";
 
         public const string Player = "Player";
-        public const string PlayerPistol = "Player With Pistol";
-        public const string PlayerRifle = "Player With Rifle";
-        public const string PlayerLaser = "Player With Laser";
+        public const string HumanPistol = "Human With Pistol";
+        public const string HumanRifle = "Human With Rifle";
+        public const string HumanLaser = "Human With Laser";
 
         public const string Zombie = "Zombie";
         public const string ZombieAttack = "Zombie Attack";

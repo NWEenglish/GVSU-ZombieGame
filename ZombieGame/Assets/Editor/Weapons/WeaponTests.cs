@@ -21,7 +21,7 @@ namespace Assets.Editor.Weapons
             GameObject bullet = GameObject.Find(ObjectNames.Bullet);
             GameObject muzzle = GameObject.Find(ObjectNames.Pistol);
             AudioSource reloadSound = GameObject.Find(ObjectNames.Pistol).GetComponent<AudioSource>();
-            Sprite sprite = GameObject.Find(ObjectNames.PlayerPistol).GetComponent<Sprite>();
+            Sprite sprite = GameObject.Find(ObjectNames.HumanPistol).GetComponent<Sprite>();
 
             PistolWeapon weapon = new(bullet, muzzle, reloadSound, sprite);
 
