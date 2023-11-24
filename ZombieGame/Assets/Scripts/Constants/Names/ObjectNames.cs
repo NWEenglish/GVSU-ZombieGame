@@ -10,6 +10,7 @@
         public const string SpawnerHolder = "Spawner Holder";
 
         public const string Player = "Player";
+        public const string NPCHuman = "NPC Human";
         public const string HumanPistol = "Human With Pistol";
         public const string HumanRifle = "Human With Rifle";
         public const string HumanLaser = "Human With Laser";

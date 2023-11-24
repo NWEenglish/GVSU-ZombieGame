@@ -2,22 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Player;
 using UnityEngine;
-using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.NPC
 {
-    public class EnemyLogic : MonoBehaviour
+    public class EnemyLogic : BaseNpcLogic
     {
-        [SerializeField] Transform target;
-        NavMeshAgent agent;
+        protected override int Health { get; set; }
+        protected override int HitPoints => 10;
+        protected override int KillPoints => 60;
+        protected override TeamType Team => TeamType.ZombieTeam;
 
-        private const int HitPoints = 10;
-        private const int KillPoints = 60;
         private const float AudioRange = 10f;
         private const float AttackRange = 1.5f;
         private const float WalkingSpeed = 2.50f;
@@ -29,7 +29,6 @@ namespace Assets.Scripts
         private const double MinTimeBetweenAttacks = 2;
         private const double LengthTimeOfAttack = 1;
 
-        private int Health = 1;
         private float CurrentSpeed;
         private bool IsAttacking;
         private bool IsSprinting;
@@ -43,9 +42,7 @@ namespace Assets.Scripts
 
         private void Start()
         {
-            agent = GetComponent<NavMeshAgent>();
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
+            this.BaseStart();
 
             Health = GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Health;
             AudioSources = gameObject.GetComponents<AudioSource>().ToList();
@@ -61,20 +58,19 @@ namespace Assets.Scripts
 
         private void FixedUpdate()
         {
-            if (target != null)
+            if (Target != null)
             {
-                agent.SetDestination(target.position);
-                transform.rotation = Quaternion.LookRotation(Vector3.forward, agent.velocity.normalized);
+                Agent.SetDestination(Target.position);
+                transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
                 transform.rotation *= Quaternion.Euler(0f, 0f, 90);
             }
         }
 
+        // Think we can move this to BaseNPC once Friendly has audio/attacking concepts
         private void Update()
         {
-            if (Health <= 0)
-            {
-                Destroy(gameObject);
-            }
+            UpdateClosestTarget();
+            CheckIfDead();
 
             if (DateTime.Now > NextAudioTime && AudioSources.Any(a => !a.isPlaying))
             {
@@ -83,7 +79,7 @@ namespace Assets.Scripts
 
             if (DateTime.Now > LastAttackTime.AddSeconds(MinTimeBetweenAttacks))
             {
-                if (target != null && Vector2.Distance(target.position, gameObject.transform.position) <= AttackRange)
+                if (Target != null && Vector2.Distance(Target.position, gameObject.transform.position) <= AttackRange)
                 {
                     AttackState();
                 }
@@ -114,16 +110,24 @@ namespace Assets.Scripts
                     }
                 }
             }
-            else if (collision.gameObject.HasComponent<PlayerLogic>() && IsAttacking)
+            else if (IsAttacking)
             {
-                collision.gameObject.GetComponent<PlayerLogic>().Hit();
-                AttackHitState();
+                if (collision.gameObject.HasComponent<PlayerLogic>())
+                {
+                    collision.gameObject.GetComponent<PlayerLogic>().Hit();
+                    AttackHitState();
+                }
+                else if (collision.gameObject.HasComponent<FriendlyLogic>())
+                {
+                    collision.gameObject.GetComponent<FriendlyLogic>().Hit();
+                    AttackHitState();
+                }
             }
         }
 
         private void NormalState()
         {
-            agent.speed = CurrentSpeed;
+            Agent.speed = CurrentSpeed;
             IsAttacking = false;
             SpriteRenderer.sprite = IdleSprite;
             Destroy(gameObject.GetComponent<PolygonCollider2D>());
@@ -137,21 +141,21 @@ namespace Assets.Scripts
             Destroy(gameObject.GetComponent<PolygonCollider2D>());
             gameObject.AddComponent<PolygonCollider2D>();
 
-            agent.speed = AttackSpeed;
+            Agent.speed = AttackSpeed;
             LastAttackTime = DateTime.Now;
             IsAttacking = true;
         }
 
         private void AttackHitState()
         {
-            agent.speed = PlayerHitSpeed;
+            Agent.speed = PlayerHitSpeed;
             LastAttackTime = DateTime.Now;
             IsAttacking = false;
         }
 
         private void PlayAudio()
         {
-            if (target != null && Vector2.Distance(target.position, gameObject.transform.position) <= AudioRange)
+            if (Target != null && Vector2.Distance(Target.position, gameObject.transform.position) <= AudioRange)
             {
                 int randomValue = (int)((Random.value * 100) % AudioSources.Count);
                 AudioSources[randomValue].TryPlay();
