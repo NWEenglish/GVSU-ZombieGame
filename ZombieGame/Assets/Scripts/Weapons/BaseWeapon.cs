@@ -2,7 +2,7 @@ using System;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
 using Assets.Scripts.Helpers;
-using Assets.Scripts.Stores;
+using Assets.Scripts.Stores.WeaponStores;
 using UnityEngine;
 
 namespace Assets.Scripts.Weapons
@@ -57,7 +57,7 @@ namespace Assets.Scripts.Weapons
             return ReloadSound.isPlaying;
         }
 
-        public void PurchaseAmmo(ref int Points, BaseStore store)
+        public void PurchaseAmmo(ref int Points, BaseWeaponStore store)
         {
             if (store.Type == Type)
             {

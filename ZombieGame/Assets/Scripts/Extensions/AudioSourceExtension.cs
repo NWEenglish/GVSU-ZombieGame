@@ -15,7 +15,7 @@ namespace Assets.Scripts.Extensions
 
             try
             {
-                logger.LogDebug($"Attempting to play audio. | AudioSourceName: {audioSource.name}");
+                logger.LogDebug($"Attempting to play audio. | AudioSourceName: {audioSource?.name}");
                 if (audioSource != null)
                 {
                     audioSource.Play();
@@ -23,7 +23,7 @@ namespace Assets.Scripts.Extensions
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error occurred while attempting to play audio. | AudioSourceName: {audioSource.name}");
+                logger.LogError(ex, $"Error occurred while attempting to play audio. | AudioSourceName: {audioSource?.name}");
                 wasPlayed = false;
             }
 

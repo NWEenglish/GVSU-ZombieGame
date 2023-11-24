@@ -6,7 +6,7 @@ using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.HUD;
-using Assets.Scripts.Stores;
+using Assets.Scripts.Stores.WeaponStores;
 using Assets.Scripts.Weapons;
 using TMPro;
 using UnityEngine;
@@ -20,7 +20,7 @@ namespace Assets.Scripts.Player
         public PlayerStatus Status { get; private set; }
 
         private Rigidbody2D Body;
-        private BaseStore CurrentStore;
+        private BaseWeaponStore CurrentStore;
         private BaseWeapon CurrentWeapon;
         private List<BaseWeapon> Weapons;
         private AmmoHUD AmmoHUD;
@@ -90,15 +90,15 @@ namespace Assets.Scripts.Player
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.gameObject.HasComponent<BaseStore>())
+            if (collision.gameObject.HasComponent<BaseWeaponStore>())
             {
-                CurrentStore = collision.GetComponent<BaseStore>();
+                CurrentStore = collision.GetComponent<BaseWeaponStore>();
             }
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.gameObject.HasComponent<BaseStore>())
+            if (collision.gameObject.HasComponent<BaseWeaponStore>())
             {
                 CurrentStore = null;
             }
