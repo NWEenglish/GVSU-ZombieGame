@@ -12,6 +12,7 @@ Zombie News - OrbitStudios, Fernando Ferreira - https://opengameart.org/content/
 Pistol - gamedevshirious - https://opengameart.org/content/pixel-pistol
 Pixel Art 2D Weapons Pack - Cayden Franklin - https://opengameart.org/content/pixel-art-2d-weapons-pack
 Lasergun - Vaceslav Kreller (John2k) - https://opengameart.org/content/lasergun
+Motorola Micro Tac - Pong Man - https://opengameart.org/content/motorola-microtac
 
 -- AI Library --
 NavMeshPlus - h8man - https://github.com/h8man/NavMeshPlus
@@ -27,3 +28,4 @@ Menu_4 - Alexandr Zhelanov - https://soundcloud.com/alexandr-zhelanov
 Key Pickup 2 - Vinrax - https://opengameart.org/content/key-pickup-2
 Remix of Metaruka's "The End" - AVGVSTA - https://opengameart.org/content/the-end-death-screen-mix
 Laser shot - Gumichan01 - https://opengameart.org/content/laser-shot
+Starship Troopers Voice Acting - JPolito (Josh Polito) - https://freesound.org/people/JPolito/packs/8905/
