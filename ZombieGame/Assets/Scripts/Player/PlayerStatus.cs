@@ -1,4 +1,5 @@
 ﻿using System;
+using Assets.Scripts.Stores.SupportStores;
 using Assets.Scripts.Stores.WeaponStores;
 using Assets.Scripts.Weapons;
 using Logger = Assets.Scripts.Singletons.Logger;
@@ -62,6 +63,13 @@ namespace Assets.Scripts.Player
             Points = points;
 
             return weapon;
+        }
+
+        public void HandleSupportPurchase(BaseSupportStore store)
+        {
+            int points = Points;
+            store.PurchaseSupport(ref points, store.gameObject.transform.position);
+            Points = points;
         }
 
         private void RegenHealth()

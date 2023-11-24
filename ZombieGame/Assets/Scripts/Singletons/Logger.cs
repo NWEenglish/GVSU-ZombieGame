@@ -24,6 +24,11 @@ namespace Assets.Scripts.Singletons
             UnityEngine.Debug.Log(message);
         }
 
+        public void LogError(string message)
+        {
+            UnityEngine.Debug.LogError($"<color=red>Error: </color>{message}");
+        }
+
         public void LogError(Exception exception, string message)
         {
             UnityEngine.Debug.LogError($"<color=red>Error: </color>{message} | ExceptionMessage: {exception?.Message}");

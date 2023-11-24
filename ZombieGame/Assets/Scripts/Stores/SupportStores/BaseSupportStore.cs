@@ -1,6 +1,9 @@
-﻿using Assets.Scripts.Constants.Types;
+﻿using System;
+using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
-using Assets.Scripts.Singletons;
+using UnityEngine;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.Stores.SupportStores
 {
@@ -11,14 +14,13 @@ namespace Assets.Scripts.Stores.SupportStores
 
         private readonly Logger _logger = Logger.GetLogger();
 
-        public void BuySupport(ref int Points)
+        public void PurchaseSupport(ref int Points, Vector3 position)
         {
             if (Points >= CostToBuy)
             {
                 Points -= CostToBuy;
                 PurchaseSound.TryPlay();
-
-                // Spawn support
+                SpawnSupport(position);
 
                 _logger.LogDebug($"Player has purchased support. | CostToBuy: {CostToBuy} | RemainingTotalPoints: {Points}");
             }
@@ -26,6 +28,29 @@ namespace Assets.Scripts.Stores.SupportStores
             {
                 _logger.LogDebug($"Player was not able to purchase support. | CostToBuy: {CostToBuy} | TotalPoints: {Points}");
             }
+        }
+
+        private GameObject SpawnSupport(Vector3 position)
+        {
+            GameObject originalSupport = null;
+            GameObject retSpawnedSupport = null;
+
+            if (Type == SupportType.Rifle)
+            {
+                originalSupport = GameObject.Find(ObjectNames.NPCHuman);
+            }
+            else
+            {
+                _logger.LogError($"The provided support type has not been implemented. | SupportType: {Type}");
+                throw new NotImplementedException();
+            }
+
+            if (originalSupport != null)
+            {
+                retSpawnedSupport = Instantiate(originalSupport, position, new Quaternion());
+            }
+
+            return retSpawnedSupport;
         }
     }
 }
