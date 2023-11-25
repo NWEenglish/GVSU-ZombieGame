@@ -22,9 +22,11 @@ namespace Assets.Scripts
             Audio.TryPlay();
 
             // Ignore bullet collision with player
-            PolygonCollider2D playerCollider = GameObject.Find(ObjectNames.Player).GetComponent<PolygonCollider2D>();
+            PolygonCollider2D playerCollider = GameObject.Find(ObjectNames.Player)?.GetComponent<PolygonCollider2D>();
             PolygonCollider2D bulletCollider = gameObject.GetComponent<PolygonCollider2D>();
             Physics2D.IgnoreCollision(playerCollider, bulletCollider);
+
+            // Ignore collision with ally?
         }
 
         private void Update()

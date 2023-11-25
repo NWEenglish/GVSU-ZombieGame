@@ -54,7 +54,7 @@ namespace Assets.Scripts.Weapons
 
         public bool IsReloading()
         {
-            return ReloadSound.isPlaying;
+            return ReloadSound?.isPlaying ?? false;
         }
 
         public void PurchaseAmmo(ref int Points, BaseWeaponStore store)
