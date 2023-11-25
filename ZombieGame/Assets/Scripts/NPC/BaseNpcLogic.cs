@@ -8,16 +8,22 @@ namespace Assets.Scripts.NPC
 {
     public abstract class BaseNpcLogic : MonoBehaviour
     {
+
         public abstract TeamType Team { get; }
 
         [SerializeField]
         protected Transform Target;
         protected NavMeshAgent Agent;
+        protected bool ShouldMute = true;
 
         protected abstract int Health { get; set; }
-
         protected abstract int HitPoints { get; }
         protected abstract int KillPoints { get; }
+
+        public void InitValues()
+        {
+            ShouldMute = false;
+        }
 
         protected void BaseStart()
         {

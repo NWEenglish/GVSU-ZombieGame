@@ -54,6 +54,11 @@ namespace Assets.Scripts.NPC
             IsSprinting = GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().ShouldSprint;
             CurrentSpeed = IsSprinting ? SprintingSpeed : WalkingSpeed;
 
+            foreach (AudioSource source in AudioSources)
+            {
+                source.mute = ShouldMute;
+            }
+
             SetNextAudioPlayTime();
         }
 

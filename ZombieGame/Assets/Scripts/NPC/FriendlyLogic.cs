@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
@@ -6,6 +7,7 @@ using Assets.Scripts.Extensions;
 using Assets.Scripts.Player;
 using Assets.Scripts.Weapons;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.NPC
 {
@@ -21,12 +23,15 @@ namespace Assets.Scripts.NPC
 
         private BaseWeapon CurrentWeapon;
         private float NearbyRange => 10f;
-        private int TimeBetweenShotMs => 500;
+        private int MinTimeBetweenChatter => 10;
         private bool CanShoot() => true;
 
         private NpcAim Aim;
         private List<GameObject> NearbyTargets = new List<GameObject>();
         private Rigidbody2D Rigidbody;
+        private AudioSource Scream;
+        private List<AudioSource> Chatter;
+        private DateTime LastChatterTime = DateTime.Now;
 
         private void Start()
         {
@@ -40,6 +45,15 @@ namespace Assets.Scripts.NPC
             GameObject bullet = GameObject.Find(ObjectNames.Bullet);
             AudioSource reloadAudio = Muzzle.GetComponent<AudioSource>();
             CurrentWeapon = new RifleWeapon(bullet, Muzzle, reloadAudio, null);
+
+            Scream = gameObject.GetComponents<AudioSource>().First(audio => audio.clip.name.Contains("scream"));
+            Chatter = gameObject.GetComponents<AudioSource>().Where(audio => !audio.clip.name.Contains("scream")).ToList();
+
+            Scream.mute = ShouldMute;
+            foreach (var audio in Chatter)
+            {
+                audio.mute = ShouldMute;
+            }
         }
 
         private void Update()
@@ -56,12 +70,28 @@ namespace Assets.Scripts.NPC
             {
                 RotateTowardsEnemy(closestVisibleEnemy);
                 AttemptToShoot();
+                AttemptCombatChatter();
             }
 
             // Check if needs reload
             if (CurrentWeapon.RemainingClipAmmo == 0)
             {
                 CurrentWeapon.Reload();
+            }
+        }
+
+        private void AttemptCombatChatter()
+        {
+            if (!Scream.isPlaying && !Chatter.Any(audio => audio.isPlaying))
+            {
+                // Time out completed and now checking for chance for bots to have chatter.
+                if (DateTime.Now.Subtract(LastChatterTime).TotalSeconds > MinTimeBetweenChatter
+                    && (int)((Random.value * 100) % 100) == 0)
+                {
+                    AudioSource audio = Chatter.ElementAt((int)((Random.value * 100) % Chatter.Count()));
+                    audio.TryPlay();
+                    LastChatterTime = DateTime.Now;
+                }
             }
         }
 
@@ -105,12 +135,6 @@ namespace Assets.Scripts.NPC
             if (target != null)
             {
                 NearbyTargets.Add(target);
-
-                var audio = gameObject.GetComponent<AudioSource>();
-                if (audio.isPlaying == false)
-                {
-                    gameObject.GetComponent<AudioSource>().TryPlay();
-                }
             }
         }
 
@@ -146,6 +170,22 @@ namespace Assets.Scripts.NPC
         public void Hit()
         {
             Health -= 15;
+
+            // Chance to scream when hit (1/5)
+            if (!Scream.isPlaying && (int)((Random.value * 100) % 5) == 0)
+            {
+                // Stop playing the other audio
+                foreach (var audioSource in Chatter)
+                {
+                    audioSource.Pause();
+                }
+
+                Scream.TryPlay();
+            }
+
+            // Add red to show bots health
+            float colorRatio = Health / 100f;
+            gameObject.GetComponent<SpriteRenderer>().color = new Color(1, colorRatio, colorRatio);
 
             if (Health <= 0)
             {

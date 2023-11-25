@@ -2,6 +2,7 @@
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
+using Assets.Scripts.NPC;
 using UnityEngine;
 using Logger = Assets.Scripts.Singletons.Logger;
 
@@ -48,6 +49,7 @@ namespace Assets.Scripts.Stores.SupportStores
             if (originalSupport != null)
             {
                 retSpawnedSupport = Instantiate(originalSupport, position, new Quaternion());
+                retSpawnedSupport.GetComponent<BaseNpcLogic>().InitValues();
             }
 
             return retSpawnedSupport;
