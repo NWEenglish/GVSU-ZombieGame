@@ -13,10 +13,11 @@ namespace Assets.Scripts.NPC
 {
     public class EnemyLogic : BaseNpcLogic
     {
+        public override TeamType Team => TeamType.ZombieTeam;
+
         protected override int Health { get; set; }
         protected override int HitPoints => 10;
         protected override int KillPoints => 60;
-        protected override TeamType Team => TeamType.ZombieTeam;
 
         private const float AudioRange = 10f;
         private const float AttackRange = 1.5f;

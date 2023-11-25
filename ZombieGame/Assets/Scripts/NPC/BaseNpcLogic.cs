@@ -8,6 +8,8 @@ namespace Assets.Scripts.NPC
 {
     public abstract class BaseNpcLogic : MonoBehaviour
     {
+        public abstract TeamType Team { get; }
+
         [SerializeField]
         protected Transform Target;
         protected NavMeshAgent Agent;
@@ -16,7 +18,6 @@ namespace Assets.Scripts.NPC
 
         protected abstract int HitPoints { get; }
         protected abstract int KillPoints { get; }
-        protected abstract TeamType Team { get; }
 
         protected void BaseStart()
         {
@@ -36,7 +37,11 @@ namespace Assets.Scripts.NPC
             // Add the player to the list if NPC is not on the same team.
             if (Team != TeamType.PlayerTeam)
             {
-                targets.Add(GameObject.FindFirstObjectByType<PlayerLogic>().transform);
+                var player = GameObject.FindFirstObjectByType<PlayerLogic>();
+                if (player != null)
+                {
+                    targets.Add(player.transform);
+                }
             }
 
             Target = targets
