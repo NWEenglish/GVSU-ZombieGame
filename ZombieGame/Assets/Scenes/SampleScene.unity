@@ -101155,7 +101155,6 @@ GameObject:
   - component: {fileID: 340237707}
   - component: {fileID: 340237708}
   - component: {fileID: 340237705}
-  - component: {fileID: 340237704}
   - component: {fileID: 340237709}
   - component: {fileID: 340237710}
   - component: {fileID: 340237711}
@@ -101186,70 +101185,6 @@ Transform:
   - {fileID: 1413000670}
   m_Father: {fileID: 715739851}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!60 &340237704
-PolygonCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 340237699}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 3.13, y: 2.07}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0.3671875, y: -0.140625}
-      - {x: 0.1328125, y: -0.21875}
-      - {x: 0.1328125, y: -0.015625}
-      - {x: 0.1171875, y: 0.203125}
-      - {x: 0.2890625, y: 0.15625}
-      - {x: 0.4765625, y: 0.1875}
-      - {x: 0.4765625, y: 0.359375}
-      - {x: 0.4453125, y: 0.40625}
-      - {x: 0.1328125, y: 0.515625}
-      - {x: -0.3203125, y: 0.515625}
-      - {x: -0.4140625, y: 0.40625}
-      - {x: -0.4765625, y: 0.1875}
-      - {x: -0.4765625, y: -0.109375}
-      - {x: -0.3515625, y: -0.46875}
-      - {x: -0.3046875, y: -0.515625}
-      - {x: 0.2421875, y: -0.515625}
-      - {x: 0.3203125, y: -0.453125}
-      - {x: 0.4453125, y: -0.328125}
-      - {x: 0.4765625, y: -0.234375}
-  m_UseDelaunayMesh: 0
 --- !u!195 &340237705
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -101336,7 +101271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5573ce5fe4a189748ae9b63af76d4c8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Target: {fileID: 0}
+  Target: {fileID: 310761731}
   Muzzle: {fileID: 2021068210}
 --- !u!50 &340237709
 Rigidbody2D:

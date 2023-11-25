@@ -23,7 +23,10 @@ namespace Assets.Scripts.NPC
 
         private BaseWeapon CurrentWeapon;
         private float NearbyRange => 10f;
+        private float FollowRange => 3f;
         private int MinTimeBetweenChatter => 10;
+        private bool ShouldFollowPlayer = true;
+
         private bool CanShoot() => true;
 
         private NpcAim Aim;
@@ -37,7 +40,10 @@ namespace Assets.Scripts.NPC
         {
             BaseStart();
 
+            Agent.stoppingDistance = FollowRange;
+
             gameObject.GetComponent<CircleCollider2D>().radius = NearbyRange;
+            gameObject.AddComponent<PolygonCollider2D>();
 
             Aim = gameObject.GetComponentInChildren<NpcAim>();
             Rigidbody = gameObject.GetComponent<Rigidbody2D>();
@@ -68,15 +74,31 @@ namespace Assets.Scripts.NPC
             // Aim at visible enemy
             if (closestVisibleEnemy != null)
             {
+                ShouldFollowPlayer = false; // Allies attempt to stand their ground
+
                 RotateTowardsEnemy(closestVisibleEnemy);
                 AttemptToShoot();
                 AttemptCombatChatter();
+            }
+            else
+            {
+                ShouldFollowPlayer = true; // Allies follows the player if not shooting at enemies.
             }
 
             // Check if needs reload
             if (CurrentWeapon.RemainingClipAmmo == 0)
             {
                 CurrentWeapon.Reload();
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            if (Target != null && ShouldFollowPlayer)
+            {
+                Agent.SetDestination(Target.position);
+                transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
+                transform.rotation *= Quaternion.Euler(0f, 0f, 90);
             }
         }
 
@@ -171,7 +193,7 @@ namespace Assets.Scripts.NPC
         {
             Health -= 15;
 
-            // Chance to scream when hit (1/5)
+            // Chance to scream when hit
             if (!Scream.isPlaying && (int)((Random.value * 100) % 5) == 0)
             {
                 // Stop playing the other audio
