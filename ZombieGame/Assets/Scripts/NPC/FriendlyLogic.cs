@@ -4,6 +4,7 @@ using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
+using Assets.Scripts.Human;
 using Assets.Scripts.Player;
 using Assets.Scripts.Weapons;
 using UnityEngine;
@@ -11,7 +12,8 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.NPC
 {
-    public class FriendlyLogic : BaseNpcLogic
+    // While right now it's FriendlyLogic, this will be turned into HumanLogic, which is intended to have sub-children for various friendly and hostile NPCs.
+    public class FriendlyLogic : BaseNpcLogic, IHumanLogic
     {
         public override TeamType Team => TeamType.PlayerTeam;
 

@@ -6,6 +6,7 @@ using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.HUD;
+using Assets.Scripts.Human;
 using Assets.Scripts.Stores;
 using Assets.Scripts.Stores.SupportStores;
 using Assets.Scripts.Stores.WeaponStores;
@@ -17,7 +18,7 @@ using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.Player
 {
-    public class PlayerLogic : MonoBehaviour
+    public class PlayerLogic : MonoBehaviour, IHumanLogic
     {
         public PlayerStatus Status { get; private set; }
 

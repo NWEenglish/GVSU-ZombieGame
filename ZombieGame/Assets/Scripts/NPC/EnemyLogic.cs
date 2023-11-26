@@ -5,6 +5,7 @@ using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
+using Assets.Scripts.Human;
 using Assets.Scripts.Player;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -74,7 +75,6 @@ namespace Assets.Scripts.NPC
             }
         }
 
-        // Think we can move this to BaseNPC once Friendly has audio/attacking concepts
         private void Update()
         {
             UpdateClosestTarget();
@@ -119,14 +119,9 @@ namespace Assets.Scripts.NPC
             }
             else if (IsAttacking)
             {
-                if (collision.gameObject.HasComponent<PlayerLogic>())
+                if (collision.gameObject.HasComponent<IHumanLogic>())
                 {
-                    collision.gameObject.GetComponent<PlayerLogic>().Hit();
-                    AttackHitState();
-                }
-                else if (collision.gameObject.HasComponent<FriendlyLogic>())
-                {
-                    collision.gameObject.GetComponent<FriendlyLogic>().Hit();
+                    collision.gameObject.GetComponent<IHumanLogic>().Hit();
                     AttackHitState();
                 }
             }
