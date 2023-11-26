@@ -1,4 +1,5 @@
 using System;
+using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
 using Assets.Scripts.Helpers;
@@ -24,6 +25,7 @@ namespace Assets.Scripts.Weapons
         private readonly GameObject Muzzle;
         private readonly GameObject Bullet;
         private DateTime LastShot;
+        private bool IsUnlimitedAmmo = false;
 
         public BaseWeapon(GameObject bullet, GameObject muzzle, AudioSource reloadSound, Sprite sprite)
         {
@@ -76,12 +78,25 @@ namespace Assets.Scripts.Weapons
                 }
                 ReloadSound.TryPlay();
             }
+
+            if (IsUnlimitedAmmo)
+            {
+                RemainingTotalAmmo = StartingAmmo;
+            }
         }
 
         // Need to destroy PolygonCollider2D and re-add for the new physics to take effect.
         public void Equip(GameObject player)
         {
             player.GetComponent<SpriteRenderer>().sprite = Sprite;
+        }
+
+        internal void EnableUnlimitedAmmo(GameObject requestingGameObject)
+        {
+            if (requestingGameObject?.tag == TagNames.NPC)
+            {
+                IsUnlimitedAmmo = true;
+            }
         }
     }
 }

@@ -5,6 +5,6 @@ namespace Assets.Scripts.Stores.SupportStores
     public class RifleSupport : BaseSupportStore
     {
         public override SupportType Type => SupportType.Rifle;
-        protected override int CostToBuy => 1; // TODO: Change
+        protected override int CostToBuy => 1000;
     }
 }

@@ -52,6 +52,7 @@ namespace Assets.Scripts.NPC
             GameObject bullet = GameObject.Find(ObjectNames.Bullet);
             AudioSource reloadAudio = Muzzle.GetComponent<AudioSource>();
             CurrentWeapon = new RifleWeapon(bullet, Muzzle, reloadAudio, null);
+            CurrentWeapon.EnableUnlimitedAmmo(gameObject);
 
             Scream = gameObject.GetComponents<AudioSource>().First(audio => audio.clip.name.Contains("scream"));
             Chatter = gameObject.GetComponents<AudioSource>().Where(audio => !audio.clip.name.Contains("scream")).ToList();
