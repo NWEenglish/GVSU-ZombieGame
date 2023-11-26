@@ -18,6 +18,7 @@ namespace Assets.Scripts.NPC
         protected override int Health { get; set; }
         protected override int HitPoints => 10;
         protected override int KillPoints => 60;
+        protected override float CurrentSpeed { get; set; }
 
         private const float AudioRange = 10f;
         private const float AttackRange = 1.5f;
@@ -30,7 +31,6 @@ namespace Assets.Scripts.NPC
         private const double MinTimeBetweenAttacks = 2;
         private const double LengthTimeOfAttack = 1;
 
-        private float CurrentSpeed;
         private bool IsAttacking;
         private bool IsSprinting;
         private DateTime NextAudioTime;

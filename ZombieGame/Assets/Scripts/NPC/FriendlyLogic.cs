@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
@@ -18,6 +18,7 @@ namespace Assets.Scripts.NPC
         protected override int Health { get; set; } = 100;
         protected override int HitPoints => 0;
         protected override int KillPoints => 0;
+        protected override float CurrentSpeed { get; set; } = 2.75f;
 
         public GameObject Muzzle;
 
@@ -43,7 +44,6 @@ namespace Assets.Scripts.NPC
             Agent.stoppingDistance = FollowRange;
 
             gameObject.GetComponent<CircleCollider2D>().radius = NearbyRange;
-            gameObject.AddComponent<PolygonCollider2D>();
 
             Aim = gameObject.GetComponentInChildren<NpcAim>();
             Rigidbody = gameObject.GetComponent<Rigidbody2D>();

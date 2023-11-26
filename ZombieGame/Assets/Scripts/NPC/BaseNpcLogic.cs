@@ -15,14 +15,17 @@ namespace Assets.Scripts.NPC
         protected Transform Target;
         protected NavMeshAgent Agent;
         protected bool ShouldMute = true;
+        protected bool ShouldMove = false;
 
         protected abstract int Health { get; set; }
         protected abstract int HitPoints { get; }
         protected abstract int KillPoints { get; }
+        protected abstract float CurrentSpeed { get; set; }
 
         public void InitValues()
         {
             ShouldMute = false;
+            ShouldMove = true;
         }
 
         protected void BaseStart()
@@ -30,6 +33,7 @@ namespace Assets.Scripts.NPC
             Agent = GetComponent<NavMeshAgent>();
             Agent.updateRotation = false;
             Agent.updateUpAxis = false;
+            Agent.speed = ShouldMove ? CurrentSpeed : 0f;
         }
 
         protected void UpdateClosestTarget()

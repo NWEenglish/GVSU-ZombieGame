@@ -1,5 +1,9 @@
-﻿using Assets.Scripts.Constants.Names;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
+using Assets.Scripts.NPC;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -21,12 +25,26 @@ namespace Assets.Scripts
             Audio = gameObject.GetComponent<AudioSource>();
             Audio.TryPlay();
 
+            PolygonCollider2D bulletCollider = gameObject.GetComponent<PolygonCollider2D>();
+
             // Ignore bullet collision with player
             PolygonCollider2D playerCollider = GameObject.Find(ObjectNames.Player)?.GetComponent<PolygonCollider2D>();
-            PolygonCollider2D bulletCollider = gameObject.GetComponent<PolygonCollider2D>();
-            Physics2D.IgnoreCollision(playerCollider, bulletCollider);
+            if (playerCollider != null)
+            {
+                Physics2D.IgnoreCollision(playerCollider, bulletCollider);
+            }
 
-            // Ignore collision with ally?
+            // Ignore collision with allies
+            List<PolygonCollider2D> allyColliders = GameObject.FindGameObjectsWithTag(TagNames.NPC)
+                .Select(npc => npc.GetComponent<BaseNpcLogic>())
+                .Where(npc => npc.Team == TeamType.PlayerTeam)
+                .Select(npc => npc.GetComponent<PolygonCollider2D>())
+                .ToList();
+
+            foreach (var allyCollider in allyColliders)
+            {
+                Physics2D.IgnoreCollision(allyCollider, bulletCollider);
+            }
         }
 
         private void Update()
