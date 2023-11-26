@@ -33,25 +33,27 @@ namespace Assets.Scripts.NPC
 
         private bool IsAttacking;
         private bool IsSprinting;
+        private GameObject Player;
         private DateTime NextAudioTime;
         private DateTime LastAttackTime;
         private List<AudioSource> AudioSources;
 
-        private Sprite IdleSprite;
-        private Sprite AttackSprite;
+        [SerializeField] private Sprite IdleSprite;
+        [SerializeField] private Sprite AttackSprite;
         private SpriteRenderer SpriteRenderer;
 
         private void Start()
         {
             this.BaseStart();
 
-            Health = GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Health;
+            WaveLogic waveLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>();
+
+            Player = GameObject.Find(ObjectNames.Player);
+            Health = waveLogic.Health;
             AudioSources = gameObject.GetComponents<AudioSource>().ToList();
-            IdleSprite = GameObject.Find(ObjectNames.ZombieIdle).GetComponent<SpriteRenderer>().sprite;
-            AttackSprite = GameObject.Find(ObjectNames.ZombieAttack).GetComponent<SpriteRenderer>().sprite;
             SpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 
-            IsSprinting = GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().ShouldSprint;
+            IsSprinting = waveLogic.ShouldSprint;
             CurrentSpeed = IsSprinting ? SprintingSpeed : WalkingSpeed;
 
             foreach (AudioSource source in AudioSources)
@@ -103,16 +105,15 @@ namespace Assets.Scripts.NPC
             {
                 Health -= collision.gameObject.GetComponent<BulletLogic>().Damage;
 
-                GameObject player = GameObject.Find(ObjectNames.Player);
-                if (player != null)
+                if (Player != null)
                 {
                     if (Health > 0)
                     {
-                        player.GetComponent<PlayerLogic>().Status.AwardPoints(HitPoints);
+                        Player.GetComponent<PlayerLogic>().Status.AwardPoints(HitPoints);
                     }
                     else
                     {
-                        player.GetComponent<PlayerLogic>().Status.AwardPoints(KillPoints);
+                        Player.GetComponent<PlayerLogic>().Status.AwardPoints(KillPoints);
                     }
                 }
             }

@@ -28,7 +28,7 @@ namespace Assets.Scripts.NPC
         private int MinTimeBetweenChatter => 10;
         private int MinTimeBetweenMovementAfterSpotMs => 500;
 
-        private bool CanShoot() => true;
+        private bool CanShoot() => CurrentWeapon.CanShoot() && CurrentWeapon.RemainingClipAmmo > 0 && CurrentWeapon.RemainingTotalAmmo > 0;
 
         private NpcAim Aim;
         private List<GameObject> NearbyTargets = new List<GameObject>();
@@ -46,7 +46,7 @@ namespace Assets.Scripts.NPC
 
             gameObject.GetComponent<CircleCollider2D>().radius = NearbyRange;
 
-            Aim = new NpcAim(gameObject.transform, (LayerMask)gameObject.layer);
+            Aim = new NpcAim(gameObject.transform);
             Rigidbody = gameObject.GetComponent<Rigidbody2D>();
 
             GameObject bullet = GameObject.Find(ObjectNames.Bullet);

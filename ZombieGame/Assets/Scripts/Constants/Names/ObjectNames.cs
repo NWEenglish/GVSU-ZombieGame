@@ -16,8 +16,6 @@
         public const string HumanLaser = "Human With Laser";
 
         public const string Zombie = "Zombie";
-        public const string ZombieAttack = "Zombie Attack";
-        public const string ZombieIdle = "Zombie Idle";
 
         public const string Ammo_HUD = "Ammo HUD";
         public const string Health_Indicator_HUD = "Health Indicator";

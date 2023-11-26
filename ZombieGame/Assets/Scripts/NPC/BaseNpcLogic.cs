@@ -11,8 +11,7 @@ namespace Assets.Scripts.NPC
 
         public abstract TeamType Team { get; }
 
-        [SerializeField]
-        protected Transform Target;
+        [SerializeField] protected Transform Target;
         protected NavMeshAgent Agent;
         protected bool ShouldMute = true;
         protected bool ShouldMove = false;
