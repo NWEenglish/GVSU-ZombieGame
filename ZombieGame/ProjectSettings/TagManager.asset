@@ -5,11 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - NPC
+  - Wall
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Entities
+  - 
   - Water
   - UI
   - WeaponMarker

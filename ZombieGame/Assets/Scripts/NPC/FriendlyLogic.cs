@@ -42,8 +42,6 @@ namespace Assets.Scripts.NPC
         {
             BaseStart();
 
-            gameObject.layer = LayerMask.NameToLayer(LayerNames.Entities);
-
             Agent.stoppingDistance = FollowRange;
 
             gameObject.GetComponent<CircleCollider2D>().radius = NearbyRange;

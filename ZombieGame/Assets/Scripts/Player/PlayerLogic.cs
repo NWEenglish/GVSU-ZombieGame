@@ -48,8 +48,6 @@ namespace Assets.Scripts.Player
 
         private void Start()
         {
-            gameObject.layer = LayerMask.NameToLayer(LayerNames.Entities);
-
             Status = new PlayerStatus();
             Body = gameObject.GetComponent<Rigidbody2D>();
 

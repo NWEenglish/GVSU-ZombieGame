@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using Assets.Scripts.Constants.Names;
 using UnityEngine;
 
 namespace Assets.Scripts.NPC
@@ -17,17 +20,17 @@ namespace Assets.Scripts.NPC
         {
             bool retWasHit = false;
 
-            // Dones't work
-            //if (Physics2D.Linecast(StartPoint.position, otherGameObject.transform.position, ~IgnoredLayer))
-            //{
-            //    List<RaycastHit2D> hits = Physics2D.LinecastAll(StartPoint.position, otherGameObject.transform.position, ~IgnoredLayer, -10f).ToList();
-            //    retWasHit = hits.Any(hit => hit.collider.TryGetComponent<TilemapCollider2D>(out _));
-            //}
+#if UNITY_EDITOR
+            Debug.DrawLine(StartPoint.position, otherGameObject.transform.position);
+#endif
 
-            if (Physics2D.Raycast(StartPoint.position, otherGameObject.transform.position))
+            if (Physics2D.Linecast(StartPoint.position, otherGameObject.transform.position))
             {
-                RaycastHit2D hit = Physics2D.Raycast(StartPoint.position, StartPoint.right, Mathf.Infinity, ~IgnoredLayer);
-                retWasHit = hit.collider != null;
+                List<RaycastHit2D> hits = Physics2D.LinecastAll(StartPoint.position, otherGameObject.transform.position).ToList();
+
+                // Filter out everything buts walls and the target ovject
+                RaycastHit2D firstApplicableHit = hits.FirstOrDefault(hit => hit.collider?.gameObject?.tag == TagNames.Wall || hit.collider?.gameObject == otherGameObject);
+                retWasHit = firstApplicableHit.collider?.gameObject == otherGameObject;
             }
 
             return retWasHit;
