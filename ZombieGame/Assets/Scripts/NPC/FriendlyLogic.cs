@@ -26,7 +26,7 @@ namespace Assets.Scripts.NPC
         private float NearbyRange => 10f;
         private float FollowRange => 3f;
         private int MinTimeBetweenChatter => 10;
-        private bool ShouldFollowPlayer = true;
+        private int MinTimeBetweenMovementAfterSpotMs => 500;
 
         private bool CanShoot() => true;
 
@@ -35,7 +35,9 @@ namespace Assets.Scripts.NPC
         private Rigidbody2D Rigidbody;
         private AudioSource Scream;
         private List<AudioSource> Chatter;
-        private DateTime LastChatterTime = DateTime.Now;
+        private DateTime LastChatterTime = DateTime.MinValue;
+        private DateTime LastEnemySpotTime = DateTime.MinValue;
+        private GameObject ClosestVisibleEnemy;
 
         private void Start()
         {
@@ -66,23 +68,19 @@ namespace Assets.Scripts.NPC
         {
             CheckIfDead();
 
-            var closestVisibleEnemy = NearbyTargets
+            ClosestVisibleEnemy = NearbyTargets
                 .Where(t => Aim.IsVisible(t))
                 .OrderBy(t => Vector2.Distance(gameObject.transform.position, t.transform.position))
                 .FirstOrDefault();
 
             // Aim at visible enemy
-            if (closestVisibleEnemy != null)
+            if (ClosestVisibleEnemy != null)
             {
-                ShouldFollowPlayer = false; // Allies attempt to stand their ground
+                LastEnemySpotTime = DateTime.Now;
 
-                RotateTowardsEnemy(closestVisibleEnemy);
+                RotateTowardsGameObject(ClosestVisibleEnemy);
                 AttemptToShoot();
                 AttemptCombatChatter();
-            }
-            else
-            {
-                ShouldFollowPlayer = true; // Allies follows the player if not shooting at enemies.
             }
 
             // Check if needs reload
@@ -94,11 +92,14 @@ namespace Assets.Scripts.NPC
 
         private void FixedUpdate()
         {
-            if (Target != null && ShouldFollowPlayer)
+            if (Target != null && DateTime.Now.Subtract(LastEnemySpotTime).Milliseconds > MinTimeBetweenMovementAfterSpotMs)
             {
                 Agent.SetDestination(Target.position);
-                transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
-                transform.rotation *= Quaternion.Euler(0f, 0f, 90);
+                if (Agent.remainingDistance > Agent.stoppingDistance)
+                {
+                    transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
+                    transform.rotation *= Quaternion.Euler(0f, 0f, 90);
+                }
             }
         }
 
@@ -126,9 +127,9 @@ namespace Assets.Scripts.NPC
             }
         }
 
-        private void RotateTowardsEnemy(GameObject enemy)
+        private void RotateTowardsGameObject(GameObject other)
         {
-            Vector2 target = new Vector2(enemy.transform.position.x - gameObject.transform.position.x, enemy.transform.position.y - gameObject.transform.position.y);
+            Vector2 target = new Vector2(other.transform.position.x - gameObject.transform.position.x, other.transform.position.y - gameObject.transform.position.y);
             Quaternion quaternion = Quaternion.LookRotation(Vector3.forward, target);
             Rigidbody.transform.rotation = Quaternion.RotateTowards(Rigidbody.transform.rotation, quaternion, 100);
             Rigidbody.transform.rotation *= Quaternion.Euler(0f, 0f, 90f);
