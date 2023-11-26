@@ -2,37 +2,35 @@ using UnityEngine;
 
 namespace Assets.Scripts.NPC
 {
-    public class NpcAim : MonoBehaviour
+    public class NpcAim
     {
-        public LineRenderer LineRenderer;
-        public Transform StartPoint;
+        private Transform StartPoint;
+        private LayerMask IgnoredLayer;
 
-        [SerializeField]
-        private float AimDistance = 100f;
-
-        private void Start()
+        public NpcAim(Transform startPoint, LayerMask ignoredLayer)
         {
-            if (StartPoint == null)
-            {
-                StartPoint = gameObject.GetComponent<Transform>();
-            }
+            StartPoint = startPoint;
+            IgnoredLayer = ignoredLayer;
         }
 
-        public bool IsVisible(GameObject gameObject)
+        public bool IsVisible(GameObject otherGameObject)
         {
-            bool wasHit = false;
+            bool retWasHit = false;
 
-            if (Physics2D.Raycast(StartPoint.position, gameObject.transform.position))
+            // Dones't work
+            //if (Physics2D.Linecast(StartPoint.position, otherGameObject.transform.position, ~IgnoredLayer))
+            //{
+            //    List<RaycastHit2D> hits = Physics2D.LinecastAll(StartPoint.position, otherGameObject.transform.position, ~IgnoredLayer, -10f).ToList();
+            //    retWasHit = hits.Any(hit => hit.collider.TryGetComponent<TilemapCollider2D>(out _));
+            //}
+
+            if (Physics2D.Raycast(StartPoint.position, otherGameObject.transform.position))
             {
-                RaycastHit2D hit = Physics2D.Raycast(StartPoint.position, StartPoint.right);
-
-                if (hit.collider != null)
-                {
-                    wasHit = true;
-                }
+                RaycastHit2D hit = Physics2D.Raycast(StartPoint.position, StartPoint.right, Mathf.Infinity, ~IgnoredLayer);
+                retWasHit = hit.collider != null;
             }
 
-            return wasHit;
+            return retWasHit;
         }
     }
 }

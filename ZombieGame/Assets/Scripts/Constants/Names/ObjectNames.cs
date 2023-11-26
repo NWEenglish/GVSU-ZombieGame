@@ -36,5 +36,7 @@
         public const string ControlsButton = "Controls";
         public const string CreditsHolder = "Credits Holder";
         public const string CreditsButton = "Credits";
+
+        public const string TileObstacles = "TileObstacles";
     }
 }

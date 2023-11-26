@@ -37,17 +37,18 @@ namespace Assets.Scripts.NPC
         private List<AudioSource> Chatter;
         private DateTime LastChatterTime = DateTime.MinValue;
         private DateTime LastEnemySpotTime = DateTime.MinValue;
-        private GameObject ClosestVisibleEnemy;
 
         private void Start()
         {
             BaseStart();
 
+            gameObject.layer = LayerMask.NameToLayer(LayerNames.Entities);
+
             Agent.stoppingDistance = FollowRange;
 
             gameObject.GetComponent<CircleCollider2D>().radius = NearbyRange;
 
-            Aim = gameObject.GetComponentInChildren<NpcAim>();
+            Aim = new NpcAim(gameObject.transform, (LayerMask)gameObject.layer);
             Rigidbody = gameObject.GetComponent<Rigidbody2D>();
 
             GameObject bullet = GameObject.Find(ObjectNames.Bullet);
@@ -68,19 +69,24 @@ namespace Assets.Scripts.NPC
         {
             CheckIfDead();
 
-            ClosestVisibleEnemy = NearbyTargets
+            var closestVisibleEnemy = NearbyTargets
                 .Where(t => Aim.IsVisible(t))
                 .OrderBy(t => Vector2.Distance(gameObject.transform.position, t.transform.position))
                 .FirstOrDefault();
 
             // Aim at visible enemy
-            if (ClosestVisibleEnemy != null)
+            if (closestVisibleEnemy != null)
             {
                 LastEnemySpotTime = DateTime.Now;
 
-                RotateTowardsGameObject(ClosestVisibleEnemy);
+                SetCurrentColor(isShooting: true);
+                RotateTowardsGameObject(closestVisibleEnemy);
                 AttemptToShoot();
                 AttemptCombatChatter();
+            }
+            else
+            {
+                SetCurrentColor(isShooting: false);
             }
 
             // Check if needs reload
@@ -167,29 +173,6 @@ namespace Assets.Scripts.NPC
             NearbyTargets.RemoveAll(t => t == collision.gameObject);
         }
 
-        private void OnCollisionEnter2D(Collision2D collision)
-        {
-            if (collision.gameObject.HasComponent<BulletLogic>())
-            {
-                // Friendly fire?
-                //Health -= collision.gameObject.GetComponent<BulletLogic>().Damage;
-
-                GameObject player = GameObject.Find(ObjectNames.Player);
-                if (player != null)
-                {
-                    // Maybe deduct points if hitting ally?
-                    //if (Health > 0)
-                    //{
-                    //    player.GetComponent<PlayerLogic>().Status.AwardPoints(HitPoints);
-                    //}
-                    //else
-                    //{
-                    //    player.GetComponent<PlayerLogic>().Status.AwardPoints(KillPoints);
-                    //}
-                }
-            }
-        }
-
         public void Hit()
         {
             Health -= 15;
@@ -206,14 +189,31 @@ namespace Assets.Scripts.NPC
                 Scream.TryPlay();
             }
 
-            // Add red to show bots health
-            float colorRatio = Health / 100f;
-            gameObject.GetComponent<SpriteRenderer>().color = new Color(1, colorRatio, colorRatio);
+            SetCurrentColor(isShooting: false);
 
             if (Health <= 0)
             {
                 Destroy(gameObject);
             }
+        }
+
+        private void SetCurrentColor(bool isShooting)
+        {
+            // Per Unity: Color.Yellow RGBA is (1, 0.92, 0.016, 1)
+            float greenForYellowMix = 0.92f;
+            float blueForYellowMix = 0.016f;
+
+            float colorRatio = Health / 100f;
+            float green = colorRatio;
+            float blue = colorRatio;
+
+            if (isShooting)
+            {
+                green *= greenForYellowMix;
+                blue *= blueForYellowMix;
+            }
+
+            gameObject.GetComponent<SpriteRenderer>().color = new Color(1, green, blue);
         }
     }
 }

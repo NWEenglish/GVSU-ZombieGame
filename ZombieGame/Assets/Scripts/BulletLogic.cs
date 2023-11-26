@@ -5,6 +5,7 @@ using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
 using Assets.Scripts.NPC;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Assets.Scripts
 {
@@ -45,6 +46,10 @@ namespace Assets.Scripts
             {
                 Physics2D.IgnoreCollision(allyCollider, bulletCollider);
             }
+
+            // Ignore collision with non-wall obstacales
+            TilemapCollider2D nonWallObstacleCollider = GameObject.Find(ObjectNames.TileObstacles).GetComponent<TilemapCollider2D>();
+            Physics2D.IgnoreCollision(nonWallObstacleCollider, bulletCollider);
         }
 
         private void Update()
