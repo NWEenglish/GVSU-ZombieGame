@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
 using Assets.Scripts.Player;
@@ -13,6 +14,8 @@ namespace Assets.Scripts.Stores.WeaponStores
         public abstract WeaponType Type { get; }
         protected abstract int CostForAmmo { get; }
         protected abstract int AmmoReplenish { get; }
+
+        protected override List<GameObject> PurchasedItems { get; set; } = new List<GameObject> { };
         protected override string DisplayText => $"Buy: {CostToBuy}\nAmmo: {CostForAmmo}\nPress 'B' to buy";
 
         private readonly Logger _logger = Logger.GetLogger();

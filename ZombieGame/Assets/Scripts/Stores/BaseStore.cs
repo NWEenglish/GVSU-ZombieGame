@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Extensions;
+﻿using System.Collections.Generic;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.Player;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ namespace Assets.Scripts.Stores
     {
         protected abstract int CostToBuy { get; }
         protected abstract string DisplayText { get; }
+        protected abstract List<GameObject> PurchasedItems { get; set; }
 
         protected AudioSource PurchaseSound { get; private set; }
 
@@ -19,7 +21,16 @@ namespace Assets.Scripts.Stores
 
             TextMesh = gameObject.GetComponentInChildren<TextMesh>();
             TextMesh.color = Color.clear;
-            TextMesh.text = DisplayText;
+        }
+
+        private void Update()
+        {
+            if (TextMesh.text != DisplayText)
+            {
+                TextMesh.text = DisplayText;
+            }
+
+            PurchasedItems.RemoveAll(pi => pi == null);
         }
 
         private void OnTriggerStay2D(Collider2D collision)

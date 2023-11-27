@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
@@ -10,14 +11,18 @@ namespace Assets.Scripts.Stores.SupportStores
 {
     public abstract class BaseSupportStore : BaseStore
     {
-        public abstract SupportType Type { get; }
-        protected override string DisplayText => $"Buy {Type} Support: {CostToBuy}\nPress 'B' to buy";
+        protected abstract SupportType Type { get; }
+        protected abstract int AllowedTotalSupport { get; }
+
+        protected override List<GameObject> PurchasedItems { get; set; } = new List<GameObject>();
+        protected override string DisplayText => $"Buy {Type} Support: {CostToBuy}\n({PurchasedItems.Count} of {AllowedTotalSupport} Active)\nPress 'B' to buy";
 
         private readonly Logger _logger = Logger.GetLogger();
+        private int CurrentTotalSupport;
 
         public void PurchaseSupport(ref int Points, Vector3 position)
         {
-            if (Points >= CostToBuy)
+            if (Points >= CostToBuy && AllowedTotalSupport > CurrentTotalSupport)
             {
                 Points -= CostToBuy;
                 PurchaseSound.TryPlay();
@@ -27,7 +32,7 @@ namespace Assets.Scripts.Stores.SupportStores
             }
             else
             {
-                _logger.LogDebug($"Player was not able to purchase support. | CostToBuy: {CostToBuy} | TotalPoints: {Points}");
+                _logger.LogDebug($"Player was not able to purchase support. | CostToBuy: {CostToBuy} | TotalPoints: {Points} | CurrentTotalSupport: {CurrentTotalSupport} | AllowedTotalSupport: {AllowedTotalSupport}");
             }
         }
 
@@ -50,6 +55,7 @@ namespace Assets.Scripts.Stores.SupportStores
             {
                 retSpawnedSupport = Instantiate(originalSupport, position, new Quaternion());
                 retSpawnedSupport.GetComponent<BaseNpcLogic>().InitValues();
+                PurchasedItems.Add(retSpawnedSupport);
             }
 
             return retSpawnedSupport;
