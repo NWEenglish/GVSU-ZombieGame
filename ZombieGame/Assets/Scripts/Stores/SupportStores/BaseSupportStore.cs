@@ -18,11 +18,10 @@ namespace Assets.Scripts.Stores.SupportStores
         protected override string DisplayText => $"Buy {Type} Support: {CostToBuy}\n({PurchasedItems.Count} of {AllowedTotalSupport} Active)\nPress 'B' to buy";
 
         private readonly Logger _logger = Logger.GetLogger();
-        private int CurrentTotalSupport;
 
         public void PurchaseSupport(ref int Points, Vector3 position)
         {
-            if (Points >= CostToBuy && AllowedTotalSupport > CurrentTotalSupport)
+            if (Points >= CostToBuy && AllowedTotalSupport > PurchasedItems.Count)
             {
                 Points -= CostToBuy;
                 PurchaseSound.TryPlay();
@@ -32,7 +31,7 @@ namespace Assets.Scripts.Stores.SupportStores
             }
             else
             {
-                _logger.LogDebug($"Player was not able to purchase support. | CostToBuy: {CostToBuy} | TotalPoints: {Points} | CurrentTotalSupport: {CurrentTotalSupport} | AllowedTotalSupport: {AllowedTotalSupport}");
+                _logger.LogDebug($"Player was not able to purchase support. | CostToBuy: {CostToBuy} | TotalPoints: {Points} | CurrentTotalSupport: {PurchasedItems.Count} | AllowedTotalSupport: {AllowedTotalSupport}");
             }
         }
 

@@ -103445,7 +103445,7 @@ Transform:
   m_GameObject: {fileID: 686926341}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.293, y: -0.707, z: 0}
+  m_LocalPosition: {x: 0.293, y: -0.775, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -103460,6 +103460,8 @@ TextMesh:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 686926341}
   m_Text: 'Buy Rifle Support: ####
+
+    (# of # Purchased)
 
     Press ''B'' to buy'
   m_OffsetZ: 0
