@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.Scripts.Player;
-using Assets.Scripts.Stores;
+using Assets.Scripts.Stores.WeaponStores;
 using Assets.Scripts.Weapons;
 using NUnit.Framework;
 using UnityEngine;
@@ -154,7 +154,7 @@ namespace Assets.Editor.Player
             playerStatus.AwardPoints(startingPoints);
 
             // Act
-            playerStatus.HandleAmmoPurchase(weapon, gameObject.GetComponent<BaseStore>());
+            playerStatus.HandleAmmoPurchase(weapon, gameObject.GetComponent<BaseWeaponStore>());
 
             // Assert
             Assert.AreEqual(expectedPoints, playerStatus.Points);

@@ -2,6 +2,7 @@
 using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Extensions;
+using Assets.Scripts.NPC;
 using TMPro;
 using UnityEngine;
 using Logger = Assets.Scripts.Singletons.Logger;
@@ -147,6 +148,7 @@ namespace Assets.Scripts.GeneralGameLogic
 
             // Spawn Zombie
             GameObject zombie = Instantiate(Zombie, spawner.Position, new Quaternion());
+            zombie.GetComponent<BaseNpcLogic>().InitValues();
             ZombiesInGame.Add(zombie);
             RemainingZombiesToSpawn--;
         }

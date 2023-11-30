@@ -6,7 +6,10 @@ using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.HUD;
+using Assets.Scripts.Human;
 using Assets.Scripts.Stores;
+using Assets.Scripts.Stores.SupportStores;
+using Assets.Scripts.Stores.WeaponStores;
 using Assets.Scripts.Weapons;
 using TMPro;
 using UnityEngine;
@@ -15,12 +18,13 @@ using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.Player
 {
-    public class PlayerLogic : MonoBehaviour
+    public class PlayerLogic : MonoBehaviour, IHumanLogic
     {
         public PlayerStatus Status { get; private set; }
 
         private Rigidbody2D Body;
-        private BaseStore CurrentStore;
+        private BaseWeaponStore CurrentWeaponStore;
+        private BaseSupportStore CurrentSupportStore;
         private BaseWeapon CurrentWeapon;
         private List<BaseWeapon> Weapons;
         private AmmoHUD AmmoHUD;
@@ -78,6 +82,7 @@ namespace Assets.Scripts.Player
         private void Update()
         {
             PurchaseWeapons();
+            PurchaseSupport();
             SwitchWeapons();
             ShootUpdate();
             ReloadLogic();
@@ -92,7 +97,14 @@ namespace Assets.Scripts.Player
         {
             if (collision.gameObject.HasComponent<BaseStore>())
             {
-                CurrentStore = collision.GetComponent<BaseStore>();
+                if (collision.gameObject.HasComponent<BaseWeaponStore>())
+                {
+                    CurrentWeaponStore = collision.GetComponent<BaseWeaponStore>();
+                }
+                else
+                {
+                    CurrentSupportStore = collision.GetComponent<BaseSupportStore>();
+                }
             }
         }
 
@@ -100,7 +112,14 @@ namespace Assets.Scripts.Player
         {
             if (collision.gameObject.HasComponent<BaseStore>())
             {
-                CurrentStore = null;
+                if (collision.gameObject.HasComponent<BaseWeaponStore>())
+                {
+                    CurrentWeaponStore = null;
+                }
+                else
+                {
+                    CurrentSupportStore = null;
+                }
             }
         }
 
@@ -129,18 +148,18 @@ namespace Assets.Scripts.Player
 
         private void PurchaseWeapons()
         {
-            if (IsPurchasing && CurrentStore != null)
+            if (IsPurchasing && CurrentWeaponStore != null)
             {
-                _logger.LogDebug($"Playing is making a purchase. | CurrentStoreName: {CurrentStore.name}");
-                if (Weapons.Any(w => w.Type == CurrentStore.Type))
+                _logger.LogDebug($"Player is making a purchase. | CurrentStoreName: {CurrentWeaponStore.name}");
+                if (Weapons.Any(w => w.Type == CurrentWeaponStore.Type))
                 {
                     _logger.LogDebug($"Player is attempting to purchase ammo.");
-                    Status.HandleAmmoPurchase(CurrentWeapon, CurrentStore);
+                    Status.HandleAmmoPurchase(CurrentWeapon, CurrentWeaponStore);
                 }
                 else
                 {
                     _logger.LogDebug($"Player is attempting to purchase a weapon.");
-                    var newWeapon = Status.HandleWeaponPurchase(CurrentStore);
+                    var newWeapon = Status.HandleWeaponPurchase(CurrentWeaponStore);
 
                     if (newWeapon != null)
                     {
@@ -159,6 +178,15 @@ namespace Assets.Scripts.Player
                         Equip();
                     }
                 }
+            }
+        }
+
+        private void PurchaseSupport()
+        {
+            if (IsPurchasing && CurrentSupportStore != null)
+            {
+                _logger.LogDebug($"Playing is making a purchase. | CurrentStoreName: {CurrentSupportStore.name}");
+                Status.HandleSupportPurchase(CurrentSupportStore);
             }
         }
 

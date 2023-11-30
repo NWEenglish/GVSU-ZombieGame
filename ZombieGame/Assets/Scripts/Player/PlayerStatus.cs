@@ -1,5 +1,6 @@
 ﻿using System;
-using Assets.Scripts.Stores;
+using Assets.Scripts.Stores.SupportStores;
+using Assets.Scripts.Stores.WeaponStores;
 using Assets.Scripts.Weapons;
 using Logger = Assets.Scripts.Singletons.Logger;
 
@@ -48,20 +49,27 @@ namespace Assets.Scripts.Player
             _logger.LogDebug($"Player has earned points. | EarnedPoints: {points} | TotalPoints: {Points}");
         }
 
-        public void HandleAmmoPurchase(BaseWeapon weapon, BaseStore store)
+        public void HandleAmmoPurchase(BaseWeapon weapon, BaseWeaponStore store)
         {
             int points = Points;
             weapon.PurchaseAmmo(ref points, store);
             Points = points;
         }
 
-        public BaseWeapon HandleWeaponPurchase(BaseStore store)
+        public BaseWeapon HandleWeaponPurchase(BaseWeaponStore store)
         {
             int points = Points;
             BaseWeapon weapon = store.PurchaseWeapon(ref points);
             Points = points;
 
             return weapon;
+        }
+
+        public void HandleSupportPurchase(BaseSupportStore store)
+        {
+            int points = Points;
+            store.PurchaseSupport(ref points, store.gameObject.transform.position);
+            Points = points;
         }
 
         private void RegenHealth()
