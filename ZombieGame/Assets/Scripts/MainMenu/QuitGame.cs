@@ -13,9 +13,9 @@ namespace Assets.Scripts.MainMenu
 
         private void OnClick()
         {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
-            #endif
+#endif
 
             Application.Quit();
         }

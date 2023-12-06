@@ -1,25 +1,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.HUD;
+using Assets.Scripts.Human;
 using Assets.Scripts.Stores;
+using Assets.Scripts.Stores.SupportStores;
+using Assets.Scripts.Stores.WeaponStores;
 using Assets.Scripts.Weapons;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.Player
 {
-    public class PlayerLogic : MonoBehaviour
+    public class PlayerLogic : MonoBehaviour, IHumanLogic
     {
         public PlayerStatus Status { get; private set; }
-        
+
         private Rigidbody2D Body;
-        private StoreHelper CurrentStore;
-        private Weapon CurrentWeapon;
-        private List<Weapon> Weapons;
+        private BaseWeaponStore CurrentWeaponStore;
+        private BaseSupportStore CurrentSupportStore;
+        private BaseWeapon CurrentWeapon;
+        private List<BaseWeapon> Weapons;
         private AmmoHUD AmmoHUD;
         private HealthHUD HealthHUD;
         private PointsHUD PointsHUD;
@@ -29,6 +36,7 @@ namespace Assets.Scripts.Player
         private const float PlayerSprintSpeed = PlayerWalkingSpeed * 2;
         private const float PlayerReloadSpeed = PlayerWalkingSpeed / 2;
         private const double HealthBlinkTime = 1;
+        private readonly Logger _logger = Logger.GetLogger();
 
         private float PlayerSpeed => GetPlayerSpeed();
         private float HorizontalSpeed => Input.GetAxisRaw("Horizontal") * PlayerSpeed;
@@ -50,7 +58,7 @@ namespace Assets.Scripts.Player
             var healthBlink = new BlinkHelper(GameObject.Find(ObjectNames.Health_Indicator_HUD).GetComponent<Image>(), Color.red, HealthBlinkTime);
             HealthHUD = new HealthHUD(GameObject.Find(ObjectNames.Health_Panel_HUD).GetComponent<Image>(), healthBlink, Status.MaxHealth);
 
-            Weapons = new List<Weapon>()
+            Weapons = new List<BaseWeapon>()
             {
                 GameObject.Find(ObjectNames.Pistol).GetComponent<PlayerPistol>().Weapon
             };
@@ -74,37 +82,44 @@ namespace Assets.Scripts.Player
         private void Update()
         {
             PurchaseWeapons();
+            PurchaseSupport();
             SwitchWeapons();
             ShootUpdate();
             ReloadLogic();
 
             Status.Update(IsMoving, IsSprinting);
-            AmmoHUD.UpdateHUD(CurrentWeapon.AmmoClip, CurrentWeapon.RemainingAmmo);
+            AmmoHUD.UpdateHUD(CurrentWeapon.RemainingClipAmmo, CurrentWeapon.RemainingTotalAmmo);
             HealthHUD.UpdateHUD(Status.Health);
             PointsHUD.UpdateHUD(Status.Points);
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.StorePistol))
+            if (collision.gameObject.HasComponent<BaseStore>())
             {
-                CurrentStore = collision.GetComponent<PistolStore>().Store;
-            }
-            else if (collision.name.Contains(ObjectNames.StoreRifle))
-            {
-                CurrentStore = collision.GetComponent<RifleStore>().Store;
-            }
-            else if (collision.name.Contains(ObjectNames.StoreLaser))
-            {
-                CurrentStore = collision.GetComponent<LaserStore>().Store;
+                if (collision.gameObject.HasComponent<BaseWeaponStore>())
+                {
+                    CurrentWeaponStore = collision.GetComponent<BaseWeaponStore>();
+                }
+                else
+                {
+                    CurrentSupportStore = collision.GetComponent<BaseSupportStore>();
+                }
             }
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.name.Contains(ObjectNames.StorePistol) || collision.name.Contains(ObjectNames.StoreRifle))
+            if (collision.gameObject.HasComponent<BaseStore>())
             {
-                CurrentStore = null;
+                if (collision.gameObject.HasComponent<BaseWeaponStore>())
+                {
+                    CurrentWeaponStore = null;
+                }
+                else
+                {
+                    CurrentSupportStore = null;
+                }
             }
         }
 
@@ -114,6 +129,7 @@ namespace Assets.Scripts.Player
 
             if (Status.Health <= 0)
             {
+                _logger.LogDebug($"Player has died. | PlayerHealth: {Status.Health}");
                 Destroy(gameObject);
                 GameOverScreen.ShowGameOver(GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Wave);
             }
@@ -132,20 +148,24 @@ namespace Assets.Scripts.Player
 
         private void PurchaseWeapons()
         {
-            if (IsPurchasing && CurrentStore != null)
+            if (IsPurchasing && CurrentWeaponStore != null)
             {
-                if (Weapons.Any(w => w.Type == CurrentStore.Type))
+                _logger.LogDebug($"Player is making a purchase. | CurrentStoreName: {CurrentWeaponStore.name}");
+                if (Weapons.Any(w => w.Type == CurrentWeaponStore.Type))
                 {
-                    Status.HandleAmmoPurchase(CurrentWeapon, CurrentStore);
+                    _logger.LogDebug($"Player is attempting to purchase ammo.");
+                    Status.HandleAmmoPurchase(CurrentWeapon, CurrentWeaponStore);
                 }
                 else
                 {
-                    var newWeapon = Status.HandleWeaponPurchase(CurrentStore);
+                    _logger.LogDebug($"Player is attempting to purchase a weapon.");
+                    var newWeapon = Status.HandleWeaponPurchase(CurrentWeaponStore);
 
                     if (newWeapon != null)
                     {
                         if (Weapons.Count == 2)
                         {
+                            _logger.LogDebug($"Player has too many weapons. Replacing the current weapon. | CurrentWeapon: {CurrentWeapon.Type}");
                             Weapons.Remove(CurrentWeapon);
                             Weapons.Add(newWeapon);
                         }
@@ -158,6 +178,15 @@ namespace Assets.Scripts.Player
                         Equip();
                     }
                 }
+            }
+        }
+
+        private void PurchaseSupport()
+        {
+            if (IsPurchasing && CurrentSupportStore != null)
+            {
+                _logger.LogDebug($"Playing is making a purchase. | CurrentStoreName: {CurrentSupportStore.name}");
+                Status.HandleSupportPurchase(CurrentSupportStore);
             }
         }
 
@@ -191,12 +220,12 @@ namespace Assets.Scripts.Player
 
         private void ShootUpdate()
         {
-            if (Input.GetMouseButton(0) && CurrentWeapon.GetType() == typeof(RifleWeapon))
+            if (Input.GetMouseButton(0) && CurrentWeapon.FireType == FireType.FullyAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
                 CurrentWeapon.Shoot(bulletTargetAngle);
             }
-            else if (Input.GetMouseButtonDown(0))
+            else if (Input.GetMouseButtonDown(0) && CurrentWeapon.FireType == FireType.SemiAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
                 CurrentWeapon.Shoot(bulletTargetAngle);

@@ -4,18 +4,16 @@ using UnityEngine;
 
 namespace Assets.Scripts.Player
 {
-    public class PlayerLaser : MonoBehaviour
+    public class PlayerLaser : BasePlayer
     {
-        public LaserWeapon Weapon { get; private set; }
+        private BaseWeapon BaseWeapon;
 
-        private void Start()
+        protected override string BulletObjectName => ObjectNames.Beam;
+        protected override string PlayerWeaponObjectName => ObjectNames.HumanLaser;
+
+        protected override BaseWeapon GetWeapon(GameObject bullet, GameObject muzzle, AudioSource reloadSound, Sprite sprite)
         {
-            var bullet = GameObject.Find(ObjectNames.Beam);
-            var muzzle = gameObject;
-            var reloadSound = gameObject.GetComponent<AudioSource>();
-            var sprite = GameObject.Find(ObjectNames.PlayerLaser).GetComponent<SpriteRenderer>().sprite;
-
-            Weapon = new LaserWeapon(bullet, muzzle, reloadSound, sprite);
+            return BaseWeapon ?? new LaserWeapon(bullet, muzzle, reloadSound, sprite);
         }
     }
 }

@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Assets.Scripts.Constants.Names;
+﻿using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.GeneralGameLogic
 {
     public class GameOverLogic : MonoBehaviour
     {
-        private bool InGameOver = false;
+        private readonly Logger _logger = Logger.GetLogger();
 
+        private bool InGameOver = false;
         private PlayerLogic Player;
         private AudioSource GameOverMusic;
 
@@ -27,11 +25,13 @@ namespace Assets.Scripts.GeneralGameLogic
         {
             if (Player.Status.IsPlayerDead && !InGameOver)
             {
+                _logger.LogDebug("Player has died. Beginning game over sequence.");
                 InGameOver = true;
-                GameOverMusic.Play();
+                GameOverMusic.TryPlay();
             }
             else if (Player.Status.IsPlayerDead && !GameOverMusic.isPlaying)
             {
+                _logger.LogDebug("Game over sequence completed. Returning to main menu.");
                 SceneManager.LoadScene(SceneNames.MainMenu);
             }
         }
