@@ -4,6 +4,16 @@
         <name>nunit.framework</name>
     </assembly>
     <members>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+                Reserved to be used by the compiler for tracking metadata.
+                This class should not be used by developers in source code.
+            </summary>
+            <remarks>
+                This definition is provided by the <i>IsExternalInit</i> NuGet package (https://www.nuget.org/packages/IsExternalInit).
+                Please see https://github.com/manuelroemer/IsExternalInit for more information.
+            </remarks>
+        </member>
         <member name="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute">
             <summary>Specifies the syntax used in a string.</summary>
         </member>
@@ -62,31 +72,23 @@
         <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Arguments">
             <summary>Gets optional arguments associated with the specific syntax employed.</summary>
         </member>
-        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+        <member name="T:System.Web.UI.ICallbackEventHandler">
             <summary>
-                Reserved to be used by the compiler for tracking metadata.
-                This class should not be used by developers in source code.
-            </summary>
-            <remarks>
-                This definition is provided by the <i>IsExternalInit</i> NuGet package (https://www.nuget.org/packages/IsExternalInit).
-                Please see https://github.com/manuelroemer/IsExternalInit for more information.
-            </remarks>
-        </member>
-        <member name="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute">
-            <summary>
-            Indicates that a parameter captures the expression passed for another parameter as a string.
+            A shim of the .NET interface for platforms that do not support it.
+            Used to indicate that a control can be the target of a callback event on the server.
             </summary>
         </member>
-        <member name="M:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.#ctor(System.String)">
+        <member name="M:System.Web.UI.ICallbackEventHandler.RaiseCallbackEvent(System.String)">
             <summary>
-            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute"/> class.
+            Processes a callback event that targets a control.
             </summary>
-            <param name="parameterName">The name of the parameter whose expression should be captured as a string.</param>
+            <param name="report"></param>
         </member>
-        <member name="P:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.ParameterName">
+        <member name="M:System.Web.UI.ICallbackEventHandler.GetCallbackResult">
             <summary>
-            Gets the name of the parameter whose expression should be captured as a string.
+            Returns the results of a callback event that targets a control.
             </summary>
+            <returns></returns>
         </member>
         <member name="T:NUnit.Framework.ActionTargets">
             <summary>
@@ -633,18 +635,12 @@
         </member>
         <member name="M:NUnit.Framework.Api.NUnitTestAssemblyRunner.WrapInNUnitCallContext(System.Action)">
             <summary>
-            Executes the action within an <see cref="T:NUnit.Framework.Internal.NUnitCallContext" />
-            which ensures the <see cref="T:System.Runtime.Remoting.Messaging.CallContext"/> is cleaned up
-            suitably at the end of the test run. This method only has an effect running
-            the full .NET Framework.
+            This method is a no-op in .NET Standard builds.
             </summary>
         </member>
         <member name="M:NUnit.Framework.Api.NUnitTestAssemblyRunner.WrapInNUnitCallContext``1(System.Func{``0})">
             <summary>
-            Executes the function within an <see cref="T:NUnit.Framework.Internal.NUnitCallContext" />
-            which ensures the <see cref="T:System.Runtime.Remoting.Messaging.CallContext"/> is cleaned up
-            suitably at the end of the test run. This method only has an effect running
-            the full .NET Framework.
+            This method is a no-op in .NET Standard builds.
             </summary>
         </member>
         <member name="T:NUnit.Framework.TestDelegate">
@@ -1374,8 +1370,8 @@
         </member>
         <member name="T:NUnit.Framework.CancelAfterAttribute">
             <summary>
-            Applies a timeout in milliseconds to a test. 
-            When applied to a method, the test's canvellation token is cancelled if the timeout is exceeded. 
+            Applies a timeout in milliseconds to a test.
+            When applied to a method, the test's cancellation token is cancelled if the timeout is exceeded.
             </summary>
             <remarks>
             The user has to monitor this cancellation token.
@@ -2484,6 +2480,13 @@
             Comma-delimited list of platforms to not run the test for
             </summary>
         </member>
+        <member name="P:NUnit.Framework.TestCaseAttribute.TypeArgs">
+            <summary>
+            Get or set the type arguments for a generic test method.
+            If not set explicitly, the generic types will be inferred
+            based on the test case parameters.
+            </summary>
+        </member>
         <member name="P:NUnit.Framework.TestCaseAttribute.Category">
             <summary>
             Gets and sets the category for this test case.
@@ -2776,26 +2779,26 @@
             <param name="typeName">The type that is being tested.</param>
         </member>
         <member name="T:NUnit.Framework.TheoryAttribute">
-            <summary>
-            Adding this attribute to a method within a <seealso cref="T:NUnit.Framework.TestFixtureAttribute"/>
-            class makes the method callable from the NUnit test runner. There is a property
-            called Description which is optional which you can provide a more detailed test
-            description. This class cannot be inherited.
-            </summary>
+             <summary>
+             Adding this attribute to a method within a <seealso cref="T:NUnit.Framework.TestFixtureAttribute"/>
+             class makes the method callable from the NUnit test runner. There is a property
+             called Description which is optional which you can provide a more detailed test
+             description. This class cannot be inherited.
+             </summary>
             
-            <example>
-            [TestFixture]
-            public class Fixture
-            {
-              [Test]
-              public void MethodToTest()
-              {}
-              
-              [Test(Description = "more detailed description")]
-              public void TestDescriptionMethod()
-              {}
-            }
-            </example>
+             <example>
+             [TestFixture]
+             public class Fixture
+             {
+               [Test]
+               public void MethodToTest()
+               {}
+            
+               [Test(Description = "more detailed description")]
+               public void TestDescriptionMethod()
+               {}
+             }
+             </example>
             
         </member>
         <member name="M:NUnit.Framework.TheoryAttribute.#ctor(System.Boolean)">
@@ -3045,6 +3048,15 @@
             </summary>
             <param name="comparer">The supplied boolean-returning delegate to use.</param>
         </member>
+        <member name="M:NUnit.Framework.Constraints.AnyOfConstraint.UsingPropertiesComparer">
+            <summary>
+            Enables comparing of instance properties.
+            </summary>
+            <remarks>
+            This allows comparing classes that don't implement <see cref="T:System.IEquatable`1"/>
+            without having to compare each property separately in own code.
+            </remarks>
+        </member>
         <member name="T:NUnit.Framework.Constraints.AssignableFromConstraint">
             <summary>
             AssignableFromConstraint is used to test that an object
@@ -3157,30 +3169,6 @@
             </summary>
             <param name="left">The first constraint</param>
             <param name="right">The second constraint</param>
-        </member>
-        <member name="T:NUnit.Framework.Constraints.BinarySerializableConstraint">
-            <summary>
-            BinarySerializableConstraint tests whether
-            an object is serializable in binary format.
-            </summary>
-        </member>
-        <member name="P:NUnit.Framework.Constraints.BinarySerializableConstraint.Description">
-            <summary>
-            The Description of what this constraint tests, for
-            use in messages and in the ConstraintResult.
-            </summary>
-        </member>
-        <member name="M:NUnit.Framework.Constraints.BinarySerializableConstraint.ApplyTo``1(``0)">
-            <summary>
-            Test whether the constraint is satisfied by a given value
-            </summary>
-            <param name="actual">The value to be tested</param>
-            <returns>True for success, false for failure</returns>
-        </member>
-        <member name="M:NUnit.Framework.Constraints.BinarySerializableConstraint.GetStringRepresentation">
-            <summary>
-            Returns the string representation
-            </summary>
         </member>
         <member name="T:NUnit.Framework.Constraints.CollectionConstraint">
             <summary>
@@ -3366,6 +3354,15 @@
             Flag the constraint to use the supplied boolean-returning delegate.
             </summary>
             <param name="comparer">The supplied boolean-returning delegate to use.</param>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.CollectionItemsEqualConstraint.UsingPropertiesComparer">
+            <summary>
+            Enables comparing of instance properties.
+            </summary>
+            <remarks>
+            This allows comparing classes that don't implement <see cref="T:System.IEquatable`1"/>
+            without having to compare each property separately in own code.
+            </remarks>
         </member>
         <member name="M:NUnit.Framework.Constraints.CollectionItemsEqualConstraint.ItemsEqual(System.Object,System.Object)">
             <summary>
@@ -3641,9 +3638,44 @@
             Comparator for two <see cref="T:System.IO.DirectoryInfo"/>s.
             </summary>
         </member>
+        <member name="T:NUnit.Framework.Constraints.Comparers.EnumComparer">
+            <summary>
+            Comparator for two <see cref="T:System.Enum"/>s.
+            </summary>
+        </member>
         <member name="T:NUnit.Framework.Constraints.Comparers.EnumerablesComparer">
             <summary>
             Comparator for two <see cref="T:System.Collections.IEnumerable"/>s.
+            </summary>
+        </member>
+        <member name="T:NUnit.Framework.Constraints.Comparers.EqualMethodResult">
+            <summary>
+            Result of the Equal comparison method.
+            </summary>
+        </member>
+        <member name="F:NUnit.Framework.Constraints.Comparers.EqualMethodResult.TypesNotSupported">
+            <summary>
+            Method does not support the instances being compared.
+            </summary>
+        </member>
+        <member name="F:NUnit.Framework.Constraints.Comparers.EqualMethodResult.ToleranceNotSupported">
+            <summary>
+            Method is appropriate for the data types, but doesn't support the specified tolerance.
+            </summary>
+        </member>
+        <member name="F:NUnit.Framework.Constraints.Comparers.EqualMethodResult.ComparedEqual">
+            <summary>
+            Method is appropriate and the items are considered equal.
+            </summary>
+        </member>
+        <member name="F:NUnit.Framework.Constraints.Comparers.EqualMethodResult.ComparedNotEqual">
+            <summary>
+            Method is appropriate and the items are considered different.
+            </summary>
+        </member>
+        <member name="F:NUnit.Framework.Constraints.Comparers.EqualMethodResult.ComparisonPending">
+            <summary>
+            Method is appropriate but the class has cyclic references.
             </summary>
         </member>
         <member name="T:NUnit.Framework.Constraints.Comparers.EqualsComparer">
@@ -4146,7 +4178,7 @@
             Gets a value indicating whether this instance is resolvable.
             </summary>
             <value>
-            	<see langword="true"/> if this instance is resolvable; otherwise, <see langword="false"/>.
+            <see langword="true"/> if this instance is resolvable; otherwise, <see langword="false"/>.
             </value>
         </member>
         <member name="T:NUnit.Framework.Constraints.ConstraintExpression">
@@ -4368,11 +4400,6 @@
             <summary>
             Returns a constraint that tests whether a collection
             contains all unique items.
-            </summary>
-        </member>
-        <member name="P:NUnit.Framework.Constraints.ConstraintExpression.BinarySerializable">
-            <summary>
-            Returns a constraint that tests whether an object graph is serializable in binary format.
             </summary>
         </member>
         <member name="P:NUnit.Framework.Constraints.ConstraintExpression.XmlSerializable">
@@ -4642,6 +4669,12 @@
         <member name="M:NUnit.Framework.Constraints.ConstraintExpression.AnyOf(System.Object[])">
             <summary>
             Returns a constraint that tests if an item is equal to any of parameters
+            </summary>
+            <param name="expected">Expected values</param>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ConstraintExpression.AnyOf(System.Collections.ICollection)">
+            <summary>
+            Returns a constraint that tests if an item is equal to any of expected values
             </summary>
             <param name="expected">Expected values</param>
         </member>
@@ -5446,6 +5479,15 @@
             <param name="comparison">The comparison function to use.</param>
             <returns>Self.</returns>
         </member>
+        <member name="M:NUnit.Framework.Constraints.EqualConstraint.UsingPropertiesComparer">
+            <summary>
+            Enables comparing of instance properties.
+            </summary>
+            <remarks>
+            This allows comparing classes that don't implement <see cref="T:System.IEquatable`1"/>
+            without having to compare each property separately in own code.
+            </remarks>
+        </member>
         <member name="M:NUnit.Framework.Constraints.EqualConstraint.ApplyTo``1(``0)">
             <summary>
             Test whether the constraint is satisfied by a given value
@@ -5485,6 +5527,16 @@
             <param name="expected">The expected collection.</param>
             <param name="actual">The actual collection</param>
             <param name="depth">The depth of this failure in a set of nested collections</param>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.EqualConstraintResult.DisplayCollectionDifferenceWithFailurePoint(NUnit.Framework.Constraints.MessageWriter,System.Collections.ICollection,System.Collections.ICollection,NUnit.Framework.Constraints.NUnitEqualityComparer.FailurePoint,System.Int32)">
+            <summary>
+            Display the failure information for two collections with failure point
+            </summary>
+            <param name="writer"></param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="failurePoint"></param>
+            <param name="depth"></param>
         </member>
         <member name="M:NUnit.Framework.Constraints.EqualConstraintResult.DisplayTypesAndSizes(NUnit.Framework.Constraints.MessageWriter,System.Collections.IEnumerable,System.Collections.IEnumerable,System.Int32)">
             <summary>
@@ -6574,6 +6626,12 @@
             those of different dimensions to be compared
             </summary>
         </member>
+        <member name="F:NUnit.Framework.Constraints.NUnitEqualityComparer._compareProperties">
+            <summary>
+            If true, when a class does not implement <see cref="T:System.IEquatable`1"/>
+            it will be compared property by property.
+            </summary>
+        </member>
         <member name="F:NUnit.Framework.Constraints.NUnitEqualityComparer._externalComparers">
             <summary>
             Comparison objects used in comparisons for some constraints.
@@ -6593,6 +6651,12 @@
             <summary>
             Gets and sets a flag indicating whether case should
             be ignored in determining equality.
+            </summary>
+        </member>
+        <member name="P:NUnit.Framework.Constraints.NUnitEqualityComparer.CompareProperties">
+            <summary>
+            Gets and sets a flag indicating whether an instance properties
+            should be compared when determining equality.
             </summary>
         </member>
         <member name="P:NUnit.Framework.Constraints.NUnitEqualityComparer.CompareAsCollection">
@@ -6750,15 +6814,15 @@
             </summary>
         </member>
         <member name="T:NUnit.Framework.Constraints.ConstraintOperator">
-            <summary>
-            The ConstraintOperator class is used internally by a
-            ConstraintBuilder to represent an operator that
-            modifies or combines constraints.
+             <summary>
+             The ConstraintOperator class is used internally by a
+             ConstraintBuilder to represent an operator that
+             modifies or combines constraints.
             
-            Constraint operators use left and right precedence
-            values to determine whether the top operator on the
-            stack should be reduced before pushing a new operator.
-            </summary>
+             Constraint operators use left and right precedence
+             values to determine whether the top operator on the
+             stack should be reduced before pushing a new operator.
+             </summary>
         </member>
         <member name="F:NUnit.Framework.Constraints.ConstraintOperator.left_precedence">
             <summary>
@@ -7147,14 +7211,14 @@
             <param name="writer">The writer on which the actual value is displayed</param>
         </member>
         <member name="T:NUnit.Framework.Constraints.PropertyExistsConstraint">
-            <summary>
-            PropertyExistsConstraint tests that a named property
-            exists on the object provided through Match.
+             <summary>
+             PropertyExistsConstraint tests that a named property
+             exists on the object provided through Match.
             
-            Originally, PropertyConstraint provided this feature
-            in addition to making optional tests on the value
-            of the property. The two constraints are now separate.
-            </summary>
+             Originally, PropertyConstraint provided this feature
+             in addition to making optional tests on the value
+             of the property. The two constraints are now separate.
+             </summary>
         </member>
         <member name="M:NUnit.Framework.Constraints.PropertyExistsConstraint.#ctor(System.String)">
             <summary>
@@ -7258,17 +7322,17 @@
             <returns>True for success, false for failure.</returns>
         </member>
         <member name="T:NUnit.Framework.Constraints.ResolvableConstraintExpression">
-            <summary>
-            ResolvableConstraintExpression is used to represent a compound
-            constraint being constructed at a point where the last operator
-            may either terminate the expression or may have additional
-            qualifying constraints added to it.
+             <summary>
+             ResolvableConstraintExpression is used to represent a compound
+             constraint being constructed at a point where the last operator
+             may either terminate the expression or may have additional
+             qualifying constraints added to it.
             
-            It is used, for example, for a Property element or for
-            an Exception element, either of which may be optionally
-            followed by constraints that apply to the property or
-            exception.
-            </summary>
+             It is used, for example, for a Property element or for
+             an Exception element, either of which may be optionally
+             followed by constraints that apply to the property or
+             exception.
+             </summary>
         </member>
         <member name="M:NUnit.Framework.Constraints.ResolvableConstraintExpression.#ctor">
             <summary>
@@ -7473,6 +7537,15 @@
             </summary>
             <param name="comparer">The IComparer object to use.</param>
             <returns>Self.</returns>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.SomeItemsConstraint.UsingPropertiesComparer">
+            <summary>
+            Enables comparing of instance properties.
+            </summary>
+            <remarks>
+            This allows comparing classes that don't implement <see cref="T:System.IEquatable`1"/>
+            without having to compare each property separately in own code.
+            </remarks>
         </member>
         <member name="T:NUnit.Framework.Constraints.StartsWithConstraint">
             <summary>
@@ -8605,15 +8678,15 @@
             <param name="filter">PreFilter to be used to select methods.</param>
         </member>
         <member name="T:NUnit.Framework.Interfaces.IImplyFixture">
-            <summary>
-            IImplyFixture is an empty marker interface used by attributes like
-            TestAttribute that cause the class where they are used to be treated
-            as a TestFixture even without a TestFixtureAttribute.
+             <summary>
+             IImplyFixture is an empty marker interface used by attributes like
+             TestAttribute that cause the class where they are used to be treated
+             as a TestFixture even without a TestFixtureAttribute.
             
-            Marker interfaces are not usually considered a good practice, but
-            we use it here to avoid cluttering the attribute hierarchy with
-            classes that don't contain any extra implementation.
-            </summary>
+             Marker interfaces are not usually considered a good practice, but
+             we use it here to avoid cluttering the attribute hierarchy with
+             classes that don't contain any extra implementation.
+             </summary>
         </member>
         <member name="T:NUnit.Framework.Interfaces.IMethodInfo">
             <summary>
@@ -8769,43 +8842,43 @@
             </summary>
         </member>
         <member name="T:NUnit.Framework.Interfaces.IPropertyBag">
-            <summary>
-            A PropertyBag represents a collection of name/value pairs
-            that allows duplicate entries with the same key. Methods
-            are provided for adding a new pair as well as for setting
-            a key to a single value. All keys are strings but values
-            may be of any type. Null values are not permitted, since
-            a null entry represents the absence of the key.
+             <summary>
+             A PropertyBag represents a collection of name/value pairs
+             that allows duplicate entries with the same key. Methods
+             are provided for adding a new pair as well as for setting
+             a key to a single value. All keys are strings but values
+             may be of any type. Null values are not permitted, since
+             a null entry represents the absence of the key.
             
-            The entries in a PropertyBag are of two kinds: those that
-            take a single value and those that take multiple values.
-            However, the PropertyBag has no knowledge of which entries
-            fall into each category and the distinction is entirely
-            up to the code using the PropertyBag.
+             The entries in a PropertyBag are of two kinds: those that
+             take a single value and those that take multiple values.
+             However, the PropertyBag has no knowledge of which entries
+             fall into each category and the distinction is entirely
+             up to the code using the PropertyBag.
             
-            When working with multi-valued properties, client code
-            should use the Add method to add name/value pairs and
-            indexing to retrieve a list of all values for a given
-            key. For example:
+             When working with multi-valued properties, client code
+             should use the Add method to add name/value pairs and
+             indexing to retrieve a list of all values for a given
+             key. For example:
             
-                bag.Add("Tag", "one");
-                bag.Add("Tag", "two");
-                Assert.That(bag["Tag"],
-                  Is.EqualTo(new string[] { "one", "two" }));
+                 bag.Add("Tag", "one");
+                 bag.Add("Tag", "two");
+                 Assert.That(bag["Tag"],
+                   Is.EqualTo(new string[] { "one", "two" }));
             
-            When working with single-valued properties, client code
-            should use the Set method to set the value and Get to
-            retrieve the value. The GetSetting methods may also be
-            used to retrieve the value in a type-safe manner while
-            also providing default. For example:
+             When working with single-valued properties, client code
+             should use the Set method to set the value and Get to
+             retrieve the value. The GetSetting methods may also be
+             used to retrieve the value in a type-safe manner while
+             also providing default. For example:
             
-                bag.Set("Priority", "low");
-                bag.Set("Priority", "high"); // replaces value
-                Assert.That(bag.Get("Priority"),
-                  Is.EqualTo("high"));
-                Assert.That(bag.GetSetting("Priority", "low"),
-                  Is.EqualTo("high"));
-            </summary>
+                 bag.Set("Priority", "low");
+                 bag.Set("Priority", "high"); // replaces value
+                 Assert.That(bag.Get("Priority"),
+                   Is.EqualTo("high"));
+                 Assert.That(bag.GetSetting("Priority", "low"),
+                   Is.EqualTo("high"));
+             </summary>
         </member>
         <member name="M:NUnit.Framework.Interfaces.IPropertyBag.Add(System.String,System.Object)">
             <summary>
@@ -10054,8 +10127,7 @@
         </member>
         <member name="M:NUnit.Framework.Internal.AssemblyHelper.Load(System.String)">
             <summary>
-            Loads an assembly given a string, which may be the
-            path to the assembly or the AssemblyName
+            Loads an assembly given a string, which is the AssemblyName
             </summary>
         </member>
         <member name="M:NUnit.Framework.Internal.AssemblyHelper.GetAssemblyPathFromCodeBase(System.String)">
@@ -10975,19 +11047,19 @@
             <param name="test">The test to which the action applies</param>
         </member>
         <member name="T:NUnit.Framework.Internal.Commands.TestCommand">
-            <summary>
-            TestCommand is the abstract base class for all test commands
-            in the framework. A TestCommand represents a single stage in
-            the execution of a test, e.g.: SetUp/TearDown, checking for
-            Timeout, verifying the returned result from a method, etc.
+             <summary>
+             TestCommand is the abstract base class for all test commands
+             in the framework. A TestCommand represents a single stage in
+             the execution of a test, e.g.: SetUp/TearDown, checking for
+             Timeout, verifying the returned result from a method, etc.
             
-            TestCommands may decorate other test commands so that the
-            execution of a lower-level command is nested within that
-            of a higher level command. All nested commands are executed
-            synchronously, as a single unit. Scheduling test execution
-            on separate threads is handled at a higher level, using the
-            task dispatcher.
-            </summary>
+             TestCommands may decorate other test commands so that the
+             execution of a lower-level command is nested within that
+             of a higher level command. All nested commands are executed
+             synchronously, as a single unit. Scheduling test execution
+             on separate threads is handled at a higher level, using the
+             task dispatcher.
+             </summary>
         </member>
         <member name="M:NUnit.Framework.Internal.Commands.TestCommand.#ctor(NUnit.Framework.Internal.Test)">
             <summary>
@@ -11017,7 +11089,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:NUnit.Framework.Internal.Commands.TestMethodCommand"/> class.
             </summary>
-            <param name="testMethod">The test.</param> 
+            <param name="testMethod">The test.</param>
         </member>
         <member name="M:NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(NUnit.Framework.Internal.TestExecutionContext)">
             <summary>
@@ -11056,6 +11128,13 @@
             <param name="innerCommand">The inner command</param>
             <param name="timeout">Timeout value</param>
             <param name="debugger">An <see cref="T:NUnit.Framework.Internal.Abstractions.IDebugger" /> instance</param>
+        </member>
+        <member name="M:NUnit.Framework.Internal.Commands.TimeoutCommand.Execute(NUnit.Framework.Internal.TestExecutionContext)">
+            <summary>
+            Runs the test, saving a TestResult in the supplied TestExecutionContext.
+            </summary>
+            <param name="context">The context in which the test should run.</param>
+            <returns>A TestResult</returns>
         </member>
         <member name="T:NUnit.Framework.Internal.ConstraintUtils">
             <summary>
@@ -11128,6 +11207,17 @@
             via <see cref="P:NUnit.Framework.Internal.AwaitAdapter.IsCompleted"/> and <see cref="M:NUnit.Framework.Internal.AwaitAdapter.OnCompleted(System.Action)"/>.
             </summary>
         </member>
+        <member name="M:NUnit.Framework.Internal.DisplayName.MayNeedEscape(System.String)">
+            <summary>
+            Checks if string contains any character that might need escaping.
+            </summary>
+        </member>
+        <member name="M:NUnit.Framework.Internal.DisplayName.MayNeedEscape(System.Char)">
+            <summary>
+            Checks whether given char *might* need escaping.
+            </summary>
+            <returns>False when absolutely no escaping is needed, otherwise true.</returns>
+        </member>
         <member name="T:NUnit.Framework.Internal.ExceptionHelper">
             <summary>
             ExceptionHelper provides static methods for working with exceptions
@@ -11161,6 +11251,13 @@
             <summary>
             Executes a parameterless synchronous or async delegate and returns the exception it throws, if any.
             </summary>
+        </member>
+        <member name="M:NUnit.Framework.Internal.ExceptionHelper.Unwrap(System.Exception)">
+            <summary>
+            Unwraps the exception of type <see cref="T:System.Reflection.TargetInvocationException"/> to its InnerException.
+            </summary>
+            <param name="exception">The exception to unwrap.</param>
+            <returns>The InnerException is available, otherwise the <paramref name="exception"/>.</returns>
         </member>
         <member name="T:NUnit.Framework.Internal.Execution.CompositeWorkItem">
             <summary>
@@ -13663,13 +13760,6 @@
         <member name="M:NUnit.Framework.Internal.MethodWrapper.GetHashCode">
             <inheritdoc />
         </member>
-        <member name="T:NUnit.Framework.Internal.NUnitCallContext">
-            <summary>
-            This class ensures the <see cref="T:System.Runtime.Remoting.Messaging.CallContext"/> is correctly cleared
-            or restored around framework actions. This is important if running multiple assemblies within the same
-            process, to ensure no leakage from one assembly to the next. See https://github.com/nunit/nunit-console/issues/325
-            </summary>
-        </member>
         <member name="T:NUnit.Framework.Internal.NUnitException">
             <summary>
             Thrown when an assertion failed. Here to preserve the inner
@@ -15487,6 +15577,13 @@
             Gets a value indicating whether an expected result was specified.
             </summary>
         </member>
+        <member name="P:NUnit.Framework.Internal.TestCaseParameters.TypeArgs">
+            <summary>
+            Get or set the type arguments for a generic test method.
+            If not set explicitly, the generic types will be inferred
+            based on the test case parameters.
+            </summary>
+        </member>
         <member name="T:NUnit.Framework.Internal.TestCaseTimeoutException">
             <summary>
             TestCaseTimeoutException is thrown when a test running directly
@@ -16017,17 +16114,6 @@
             <param name="testMethod">A TestMethod</param>
             <param name="args">Arguments to be used</param>
             <returns>The display name</returns>
-        </member>
-        <member name="M:NUnit.Framework.Internal.TestNameGenerator.NameFragment.MayNeedEscape(System.String)">
-            <summary>
-            Checks if string contains any character that might need escaping.
-            </summary>
-        </member>
-        <member name="M:NUnit.Framework.Internal.TestNameGenerator.NameFragment.MayNeedEscape(System.Char)">
-            <summary>
-            Checks whether given char *might* need escaping.
-            </summary>
-            <returns>False when absolutely no escaping is needed, otherwise true.</returns>
         </member>
         <member name="T:NUnit.Framework.Internal.TestParameters">
             <summary>
@@ -16797,55 +16883,6 @@
             for working with threads.
             </summary>
         </member>
-        <member name="M:NUnit.Framework.Internal.ThreadUtility.Delay(System.Int32,System.Threading.WaitCallback,System.Object)">
-            <summary>
-            Pre-Task compatibility
-            </summary>
-        </member>
-        <member name="M:NUnit.Framework.Internal.ThreadUtility.Abort(System.Threading.Thread,System.Int32)">
-            <summary>
-            Abort a thread, helping to dislodging it if it is blocked in native code
-            </summary>
-            <param name="thread">The thread to abort</param>
-            <param name="nativeId">The native thread id (if known), otherwise 0.
-            If provided, allows the thread to be killed if it's in a message pump native blocking wait.
-            This must have previously been captured by calling <see cref="M:NUnit.Framework.Internal.ThreadUtility.GetCurrentThreadNativeId"/> from the running thread itself.</param>
-        </member>
-        <member name="M:NUnit.Framework.Internal.ThreadUtility.Kill(System.Threading.Thread,System.Int32)">
-            <summary>
-            Do our best to kill a thread
-            </summary>
-            <param name="thread">The thread to kill</param>
-            <param name="nativeId">The native thread id (if known), otherwise 0.
-            If provided, allows the thread to be killed if it's in a message pump native blocking wait.
-            This must have previously been captured by calling <see cref="M:NUnit.Framework.Internal.ThreadUtility.GetCurrentThreadNativeId"/> from the running thread itself.</param>
-        </member>
-        <member name="M:NUnit.Framework.Internal.ThreadUtility.Kill(System.Threading.Thread,System.Object,System.Int32)">
-            <summary>
-            Do our best to kill a thread, passing state info
-            </summary>
-            <param name="thread">The thread to kill</param>
-            <param name="stateInfo">Info for the ThreadAbortException handler</param>
-            <param name="nativeId">The native thread id (if known), otherwise 0.
-            If provided, allows the thread to be killed if it's in a message pump native blocking wait.
-            This must have previously been captured by calling <see cref="M:NUnit.Framework.Internal.ThreadUtility.GetCurrentThreadNativeId"/> from the running thread itself.</param>
-        </member>
-        <member name="M:NUnit.Framework.Internal.ThreadUtility.DislodgeThreadInNativeMessageWait(System.Threading.Thread,System.Int32)">
-            <summary>
-            Schedule a thread pool thread to check on the aborting thread in case it's in a message pump native blocking wait
-            </summary>
-        </member>
-        <member name="M:NUnit.Framework.Internal.ThreadUtility.GetCurrentThreadNativeId">
-            <summary>
-            Captures the current thread's native id. If provided to <see cref="M:NUnit.Framework.Internal.ThreadUtility.Kill(System.Threading.Thread,System.Int32)"/> later, allows the thread to be killed if it's in a message pump native blocking wait.
-            </summary>
-        </member>
-        <member name="M:NUnit.Framework.Internal.ThreadUtility.PostThreadCloseMessage(System.Int32)">
-            <summary>
-            Sends a message to the thread to dislodge it from native code and allow a return to managed code, where a ThreadAbortException can be generated.
-            The message is meaningless (WM_CLOSE without a window handle) but it will end any blocking message wait.
-            </summary>
-        </member>
         <member name="M:NUnit.Framework.Internal.ThreadUtility.GetCurrentThreadPrincipal">
             <summary>Gets <see cref="P:System.Threading.Thread.CurrentPrincipal"/> or <see langword="null" /> if the current platform does not support it.</summary>
         </member>
@@ -16885,7 +16922,7 @@
             </summary>
             <param name="type">The type to be examined.</param>
             <returns>
-            	<see langword="true"/> if the specified type is numeric; otherwise, <see langword="false"/>.
+            <see langword="true"/> if the specified type is numeric; otherwise, <see langword="false"/>.
             </returns>
         </member>
         <member name="M:NUnit.Framework.Internal.TypeHelper.ConvertArgumentList(System.Object[],NUnit.Framework.Interfaces.IParameterInfo[])">
@@ -16904,7 +16941,7 @@
             <param name="arglist">The arglist.</param>
             <param name="typeArgsOut">The type args to be used.</param>
             <returns>
-            	<see langword="true"/> if this the provided args give sufficient information to determine the type args to be used; otherwise, <see langword="false"/>.
+            <see langword="true"/> if this the provided args give sufficient information to determine the type args to be used; otherwise, <see langword="false"/>.
             </returns>
         </member>
         <member name="M:NUnit.Framework.Internal.TypeHelper.GetDeclaredInterfaces(System.Type)">
@@ -17342,11 +17379,6 @@
             <summary>
             Returns a constraint that tests whether a collection
             contains all unique items.
-            </summary>
-        </member>
-        <member name="P:NUnit.Framework.Is.BinarySerializable">
-            <summary>
-            Returns a constraint that tests whether an object graph is serializable in binary format.
             </summary>
         </member>
         <member name="P:NUnit.Framework.Is.XmlSerializable">
