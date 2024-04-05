@@ -101152,8 +101152,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 340237700}
+  - component: {fileID: 340237716}
   - component: {fileID: 340237707}
-  - component: {fileID: 340237708}
   - component: {fileID: 340237705}
   - component: {fileID: 340237709}
   - component: {fileID: 340237715}
@@ -101259,20 +101259,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &340237708
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 340237699}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5573ce5fe4a189748ae9b63af76d4c8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Target: {fileID: 310761731}
-  Muzzle: {fileID: 2021068210}
 --- !u!50 &340237709
 Rigidbody2D:
   serializedVersion: 4
@@ -101818,6 +101804,20 @@ PolygonCollider2D:
       - {x: 0.39499998, y: -0.405}
       - {x: 0.255, y: -0.39499998}
   m_UseDelaunayMesh: 0
+--- !u!114 &340237716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 340237699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fa4eb92835a9254ebf27e885086b3ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 0}
+  Muzzle: {fileID: 2021068210}
 --- !u!1 &345776162
 GameObject:
   m_ObjectHideFlags: 0
@@ -103559,6 +103559,7 @@ GameObject:
   - component: {fileID: 844406654}
   - component: {fileID: 844406659}
   - component: {fileID: 844406655}
+  - component: {fileID: 844406660}
   - component: {fileID: 844406656}
   - component: {fileID: 844406657}
   - component: {fileID: 844406658}
@@ -103896,6 +103897,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b69b498c3a5359644a80859abaa31e47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &844406660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844406653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f810aff0c25bef44f8fe3e1f01aea77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GameMode: 0
 --- !u!1 &923423394
 GameObject:
   m_ObjectHideFlags: 0

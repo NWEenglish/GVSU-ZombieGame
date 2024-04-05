@@ -4,6 +4,7 @@ using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
+using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Human;
 using Assets.Scripts.Player;
 using Assets.Scripts.Weapons;
@@ -12,10 +13,10 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.NPC
 {
-    // While right now it's FriendlyLogic, this will be turned into HumanLogic, which is intended to have sub-children for various friendly and hostile NPCs.
     public class FriendlyLogic : BaseNpcLogic, IHumanLogic
     {
-        public override TeamType Team => TeamType.PlayerTeam;
+        public override TeamType Team => pTeam;
+        private TeamType pTeam = TeamType.PlayerTeam;
 
         protected override int Health { get; set; } = 100;
         protected override int HitPoints => 0;
@@ -39,6 +40,12 @@ namespace Assets.Scripts.NPC
         private List<AudioSource> Chatter;
         private DateTime LastChatterTime = DateTime.MinValue;
         private DateTime LastEnemySpotTime = DateTime.MinValue;
+        private bool MustFollowPlayer;
+
+        public void InitValues(TeamType team)
+        {
+            pTeam = team;
+        }
 
         private void Start()
         {
@@ -64,6 +71,9 @@ namespace Assets.Scripts.NPC
             {
                 audio.mute = ShouldMute;
             }
+
+            var gameLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
+            MustFollowPlayer = gameLogic.GameMode == GameModeType.ZombieMode && this.Team == TeamType.PlayerTeam;
         }
 
         private void Update()
@@ -107,6 +117,28 @@ namespace Assets.Scripts.NPC
                     transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
                     transform.rotation *= Quaternion.Euler(0f, 0f, 90);
                 }
+            }
+            else
+            {
+                SetTarget();
+            }
+        }
+
+        private void SetTarget()
+        {
+            // Follow player
+            if (Target == null && MustFollowPlayer)
+            {
+                var player = GameObject.Find(ObjectNames.Player);
+                if (player != null)
+                {
+                    Target = player.transform;
+                }
+            }
+            // Goes to Points-of-Interest
+            else
+            {
+
             }
         }
 

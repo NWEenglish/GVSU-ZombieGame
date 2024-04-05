@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
+using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Player;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,11 +10,11 @@ namespace Assets.Scripts.NPC
 {
     public abstract class BaseNpcLogic : MonoBehaviour
     {
-
         public abstract TeamType Team { get; }
 
         [SerializeField] protected Transform Target;
         protected NavMeshAgent Agent;
+        protected BaseGameModeLogic GameModeLogic;
         protected bool ShouldMute = true;
         protected bool ShouldMove = false;
 
@@ -33,6 +35,8 @@ namespace Assets.Scripts.NPC
             Agent.updateRotation = false;
             Agent.updateUpAxis = false;
             Agent.speed = ShouldMove ? CurrentSpeed : 0f;
+
+            GameModeLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
         }
 
         protected void UpdateClosestTarget()

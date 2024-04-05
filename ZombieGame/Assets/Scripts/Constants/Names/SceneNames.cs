@@ -2,7 +2,8 @@
 {
     public static class SceneNames
     {
-        public const string Game = "SampleScene";
+        public const string ZombieGameMode = "SampleScene";
+        public const string NonZombieGameMode = "NonZombieGameModeScene";
         public const string MainMenu = "MainMenuScene";
         public const string Intro = "IntroScene";
     }

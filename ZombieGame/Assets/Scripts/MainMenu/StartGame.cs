@@ -19,7 +19,7 @@ namespace Assets.Scripts.MainMenu
         private void OnClick()
         {
             _logger.LogDebug("Starting a new game.");
-            SceneManager.LoadScene(SceneNames.Game);
+            SceneManager.LoadScene(SceneNames.ZombieGameMode);
         }
     }
 }
