@@ -16,7 +16,7 @@ namespace Assets.Scripts.NPC
     public class FriendlyLogic : BaseNpcLogic, IHumanLogic
     {
         public override TeamType Team => pTeam;
-        private TeamType pTeam = TeamType.PlayerTeam;
+        private TeamType pTeam = TeamType.PlayerTeam; // when spawning team mates / opponents
 
         protected override int Health { get; set; } = 100;
         protected override int HitPoints => 0;
@@ -29,7 +29,7 @@ namespace Assets.Scripts.NPC
         private float NearbyRange => 10f;
         private float FollowRange => 3f;
         private int MinTimeBetweenChatter => 10;
-        private int MinTimeBetweenMovementAfterSpotMs => 500;
+        private int MinTimeBetweenMovementMs => 500;
 
         private bool CanShoot() => CurrentWeapon.CanShoot() && CurrentWeapon.RemainingClipAmmo > 0 && CurrentWeapon.RemainingTotalAmmo > 0;
 
@@ -39,8 +39,9 @@ namespace Assets.Scripts.NPC
         private AudioSource Scream;
         private List<AudioSource> Chatter;
         private DateTime LastChatterTime = DateTime.MinValue;
-        private DateTime LastEnemySpotTime = DateTime.MinValue;
+        private DateTime LastStoppedTime = DateTime.MinValue;
         private bool MustFollowPlayer;
+        private List<Transform> PointsOfInterest;
 
         public void InitValues(TeamType team)
         {
@@ -74,6 +75,14 @@ namespace Assets.Scripts.NPC
 
             var gameLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
             MustFollowPlayer = gameLogic.GameMode == GameModeType.ZombieMode && this.Team == TeamType.PlayerTeam;
+
+            // Don't bother wasting memory if we're just going to follow the player around
+            if (!MustFollowPlayer)
+            {
+                PointsOfInterest = GameObject.Find(ObjectNames.PointsOfInterest).GetComponentsInChildren<Transform>()
+                    .Where(c => !c.name.StartsWith("Points"))
+                    .ToList();
+            }
         }
 
         private void Update()
@@ -88,7 +97,7 @@ namespace Assets.Scripts.NPC
             // Aim at visible enemy
             if (closestVisibleEnemy != null)
             {
-                LastEnemySpotTime = DateTime.Now;
+                LastStoppedTime = DateTime.Now;
 
                 SetCurrentColor(isShooting: true);
                 RotateTowardsGameObject(closestVisibleEnemy);
@@ -109,13 +118,17 @@ namespace Assets.Scripts.NPC
 
         private void FixedUpdate()
         {
-            if (Target != null && DateTime.Now.Subtract(LastEnemySpotTime).Milliseconds > MinTimeBetweenMovementAfterSpotMs)
+            if (Target != null && DateTime.Now.Subtract(LastStoppedTime).TotalMilliseconds > MinTimeBetweenMovementMs)
             {
                 Agent.SetDestination(Target.position);
                 if (Agent.remainingDistance > Agent.stoppingDistance)
                 {
                     transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
                     transform.rotation *= Quaternion.Euler(0f, 0f, 90);
+                }
+                else
+                {
+                    LastStoppedTime = DateTime.Now;
                 }
             }
             else
@@ -135,10 +148,19 @@ namespace Assets.Scripts.NPC
                     Target = player.transform;
                 }
             }
-            // Goes to Points-of-Interest
-            else
+            // Go to Points-of-Interest
+            else if (PointsOfInterest?.Any() ?? false)
             {
+                Transform newTarget = null;
 
+                do
+                {
+                    int randomValue = (int)(Random.value * 100);
+                    newTarget = PointsOfInterest.ElementAt(randomValue % PointsOfInterest.Count);
+                }
+                while (newTarget == Target);
+
+                Target = newTarget;
             }
         }
 
@@ -162,7 +184,7 @@ namespace Assets.Scripts.NPC
             if (CanShoot())
             {
                 float bulletTargetAngle = Rigidbody.rotation;
-                CurrentWeapon.Shoot(bulletTargetAngle);
+                CurrentWeapon.Shoot(bulletTargetAngle, Team);
             }
         }
 
@@ -245,6 +267,8 @@ namespace Assets.Scripts.NPC
                 green *= greenForYellowMix;
                 blue *= blueForYellowMix;
             }
+
+            // TODO - Add a red tint to enemies, green for allies
 
             gameObject.GetComponent<SpriteRenderer>().color = new Color(1, green, blue);
         }

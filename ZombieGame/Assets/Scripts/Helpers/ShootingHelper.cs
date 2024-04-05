@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Constants.Types;
+using UnityEngine;
 
 namespace Assets.Scripts.Helpers
 {
@@ -7,7 +8,7 @@ namespace Assets.Scripts.Helpers
         private const float Speed = 1000f;
 
         // Borrowed from TankGame
-        public static GameObject Shoot(GameObject bullet, Vector3 spawnLocation, float targetAngle, int damage)
+        public static GameObject Shoot(GameObject bullet, Vector3 spawnLocation, float targetAngle, int damage, TeamType teamSource)
         {
             spawnLocation.z = 0;
 
@@ -15,7 +16,7 @@ namespace Assets.Scripts.Helpers
             GameObject firedBullet = Object.Instantiate(bullet, spawnLocation, Quaternion.AngleAxis(targetAngle - 90, Vector3.forward));
             firedBullet.GetComponent<Rigidbody2D>().AddForce(GetForceVector(targetAngle, Speed));
             firedBullet.GetComponent<AudioSource>().mute = false;
-            firedBullet.GetComponent<BulletLogic>().InitValues(damage);
+            firedBullet.GetComponent<BulletLogic>().InitValues(damage, teamSource);
 
             return firedBullet;
         }

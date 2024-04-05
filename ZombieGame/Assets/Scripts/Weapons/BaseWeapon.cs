@@ -44,13 +44,13 @@ namespace Assets.Scripts.Weapons
             return LastShot.AddMilliseconds(TimeBetweenShotsInMS) <= DateTime.Now;
         }
 
-        public void Shoot(float angle)
+        public void Shoot(float angle, TeamType teamSource)
         {
             if (RemainingClipAmmo > 0 && !IsReloading() && CanShoot())
             {
                 RemainingClipAmmo--;
                 LastShot = DateTime.Now;
-                ShootingHelper.Shoot(Bullet, Muzzle.transform.position, angle, Damage);
+                ShootingHelper.Shoot(Bullet, Muzzle.transform.position, angle, Damage, teamSource);
             }
         }
 

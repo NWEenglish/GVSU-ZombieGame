@@ -8,6 +8,7 @@
 
         public const string GameLogic = "General Game Logic";
         public const string SpawnerHolder = "Spawner Holder";
+        public const string PointsOfInterest = "Points Of Interest";
 
         public const string Player = "Player";
         public const string NPCHuman = "NPC Human";

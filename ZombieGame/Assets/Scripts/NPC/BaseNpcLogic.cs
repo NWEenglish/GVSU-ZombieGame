@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Player;
 using UnityEngine;
@@ -67,6 +68,14 @@ namespace Assets.Scripts.NPC
             if (Health <= 0)
             {
                 Destroy(gameObject);
+            }
+        }
+
+        protected void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.HasComponent<BulletLogic>())
+            {
+                Health -= collision.gameObject.GetComponent<BulletLogic>().Damage;
             }
         }
     }

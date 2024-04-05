@@ -223,12 +223,12 @@ namespace Assets.Scripts.Player
             if (Input.GetMouseButton(0) && CurrentWeapon.FireType == FireType.FullyAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
-                CurrentWeapon.Shoot(bulletTargetAngle);
+                CurrentWeapon.Shoot(bulletTargetAngle, TeamType.PlayerTeam);
             }
             else if (Input.GetMouseButtonDown(0) && CurrentWeapon.FireType == FireType.SemiAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
-                CurrentWeapon.Shoot(bulletTargetAngle);
+                CurrentWeapon.Shoot(bulletTargetAngle, TeamType.PlayerTeam);
             }
         }
 

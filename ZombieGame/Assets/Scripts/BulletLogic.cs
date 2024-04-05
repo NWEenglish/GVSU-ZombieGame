@@ -12,13 +12,15 @@ namespace Assets.Scripts
     public class BulletLogic : MonoBehaviour
     {
         public int Damage { get; private set; }
+        public TeamType TeamSource { get; private set; }
 
         private bool HasCollided = false;
         private AudioSource Audio;
 
-        public void InitValues(int damage)
+        public void InitValues(int damage, TeamType teamSource)
         {
             Damage = damage;
+            TeamSource = teamSource;
         }
 
         private void Start()
@@ -38,7 +40,7 @@ namespace Assets.Scripts
             // Ignore collision with allies
             List<PolygonCollider2D> allyColliders = GameObject.FindGameObjectsWithTag(TagNames.NPC)
                 .Select(npc => npc.GetComponent<BaseNpcLogic>())
-                .Where(npc => npc.Team == TeamType.PlayerTeam)
+                .Where(npc => npc.Team == TeamSource)
                 .Select(npc => npc.GetComponent<PolygonCollider2D>())
                 .ToList();
 
