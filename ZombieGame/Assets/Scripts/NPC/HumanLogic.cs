@@ -13,10 +13,10 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.NPC
 {
-    public class FriendlyLogic : BaseNpcLogic, IHumanLogic
+    public class HumanLogic : BaseNpcLogic, IHumanLogic
     {
         public override TeamType Team => pTeam;
-        private TeamType pTeam = TeamType.PlayerTeam; // when spawning team mates / opponents
+        private TeamType pTeam = TeamType.PlayerTeam; // Default because of zombie mode
 
         protected override int Health { get; set; } = 100;
         protected override int HitPoints => 0;
@@ -43,9 +43,12 @@ namespace Assets.Scripts.NPC
         private bool MustFollowPlayer;
         private List<Transform> PointsOfInterest;
 
-        public void InitValues(TeamType team)
+        public void InitValues(List<Transform> pointsOfInterest, TeamType team)
         {
+            PointsOfInterest = pointsOfInterest;
             pTeam = team;
+
+            this.InitValues();
         }
 
         private void Start()
@@ -75,14 +78,6 @@ namespace Assets.Scripts.NPC
 
             var gameLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
             MustFollowPlayer = gameLogic.GameMode == GameModeType.ZombieMode && this.Team == TeamType.PlayerTeam;
-
-            // Don't bother wasting memory if we're just going to follow the player around
-            if (!MustFollowPlayer)
-            {
-                PointsOfInterest = GameObject.Find(ObjectNames.PointsOfInterest).GetComponentsInChildren<Transform>()
-                    .Where(c => !c.name.StartsWith("Points"))
-                    .ToList();
-            }
         }
 
         private void Update()

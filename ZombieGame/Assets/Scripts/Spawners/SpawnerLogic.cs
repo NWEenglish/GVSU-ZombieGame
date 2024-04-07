@@ -18,6 +18,7 @@ namespace Assets.Scripts
 
         private bool IsPlayerInRange()
         {
+            // Need to check for opposing entities too
             if (Player == null)
             {
                 return false;

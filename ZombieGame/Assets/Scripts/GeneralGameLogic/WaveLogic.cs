@@ -4,6 +4,7 @@ using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
 using Assets.Scripts.NPC;
+using Assets.Scripts.Stores;
 using TMPro;
 using UnityEngine;
 using Logger = Assets.Scripts.Singletons.Logger;
@@ -15,6 +16,8 @@ namespace Assets.Scripts.GeneralGameLogic
         public int Health => CalculateHealth();
         public int Wave { get; private set; }
         public bool ShouldSprint => CalculateShouldSprint();
+
+        public override GameModeType GameMode => GameModeType.ZombieMode;
 
         private readonly Logger _logger = Logger.GetLogger();
         private const int WaitTime = 15;
@@ -30,13 +33,11 @@ namespace Assets.Scripts.GeneralGameLogic
         private TextMeshProUGUI Wave_HUD;
         private System.DateTime LastZombieSpawn;
         private System.DateTime EndOfWave;
-        private List<SpawnerLogic> Spawners;
 
         private void Start()
         {
-            GameMode = GameModeType.ZombieMode;
+            BaseStart();
 
-            Spawners = GameObject.Find(ObjectNames.SpawnerHolder).GetComponentsInChildren<SpawnerLogic>().ToList();
             Zombie = GameObject.Find(ObjectNames.Zombie);
             RoundOverMusic = gameObject.GetComponents<AudioSource>()[1];
             Wave_HUD = GameObject.Find(ObjectNames.Wave_HUD).GetComponent<TextMeshProUGUI>();
@@ -46,11 +47,6 @@ namespace Assets.Scripts.GeneralGameLogic
             EndOfWave = System.DateTime.Now;
             Wave = 0;
             RoundPlayedMusicForLast = Wave;
-
-            // Borrowed from TankGame
-            int seed = (int)(new System.Random().NextDouble() * 1000000000);
-            Random.InitState(seed);
-            GameObject.Find(ObjectNames.Seed_HUD).GetComponent<TextMeshProUGUI>().text = $"Seed: {seed}";
         }
 
         private void Update()
