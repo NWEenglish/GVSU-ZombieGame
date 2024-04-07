@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
 using Assets.Scripts.NPC;
 using TMPro;
@@ -9,7 +10,7 @@ using Logger = Assets.Scripts.Singletons.Logger;
 
 namespace Assets.Scripts.GeneralGameLogic
 {
-    public class WaveLogic : MonoBehaviour
+    public class WaveLogic : BaseGameModeLogic
     {
         public int Health => CalculateHealth();
         public int Wave { get; private set; }
@@ -33,6 +34,8 @@ namespace Assets.Scripts.GeneralGameLogic
 
         private void Start()
         {
+            GameMode = GameModeType.ZombieMode;
+
             Spawners = GameObject.Find(ObjectNames.SpawnerHolder).GetComponentsInChildren<SpawnerLogic>().ToList();
             Zombie = GameObject.Find(ObjectNames.Zombie);
             RoundOverMusic = gameObject.GetComponents<AudioSource>()[1];

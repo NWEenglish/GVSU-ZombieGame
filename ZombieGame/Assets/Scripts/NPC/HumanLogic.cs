@@ -4,6 +4,7 @@ using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
+using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Human;
 using Assets.Scripts.Player;
 using Assets.Scripts.Weapons;
@@ -12,10 +13,10 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.NPC
 {
-    // While right now it's FriendlyLogic, this will be turned into HumanLogic, which is intended to have sub-children for various friendly and hostile NPCs.
     public class FriendlyLogic : BaseNpcLogic, IHumanLogic
     {
-        public override TeamType Team => TeamType.PlayerTeam;
+        public override TeamType Team => pTeam;
+        private TeamType pTeam = TeamType.PlayerTeam; // when spawning team mates / opponents
 
         protected override int Health { get; set; } = 100;
         protected override int HitPoints => 0;
@@ -28,7 +29,7 @@ namespace Assets.Scripts.NPC
         private float NearbyRange => 10f;
         private float FollowRange => 3f;
         private int MinTimeBetweenChatter => 10;
-        private int MinTimeBetweenMovementAfterSpotMs => 500;
+        private int MinTimeBetweenMovementMs => 500;
 
         private bool CanShoot() => CurrentWeapon.CanShoot() && CurrentWeapon.RemainingClipAmmo > 0 && CurrentWeapon.RemainingTotalAmmo > 0;
 
@@ -38,7 +39,14 @@ namespace Assets.Scripts.NPC
         private AudioSource Scream;
         private List<AudioSource> Chatter;
         private DateTime LastChatterTime = DateTime.MinValue;
-        private DateTime LastEnemySpotTime = DateTime.MinValue;
+        private DateTime LastStoppedTime = DateTime.MinValue;
+        private bool MustFollowPlayer;
+        private List<Transform> PointsOfInterest;
+
+        public void InitValues(TeamType team)
+        {
+            pTeam = team;
+        }
 
         private void Start()
         {
@@ -64,6 +72,17 @@ namespace Assets.Scripts.NPC
             {
                 audio.mute = ShouldMute;
             }
+
+            var gameLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
+            MustFollowPlayer = gameLogic.GameMode == GameModeType.ZombieMode && this.Team == TeamType.PlayerTeam;
+
+            // Don't bother wasting memory if we're just going to follow the player around
+            if (!MustFollowPlayer)
+            {
+                PointsOfInterest = GameObject.Find(ObjectNames.PointsOfInterest).GetComponentsInChildren<Transform>()
+                    .Where(c => !c.name.StartsWith("Points"))
+                    .ToList();
+            }
         }
 
         private void Update()
@@ -78,7 +97,7 @@ namespace Assets.Scripts.NPC
             // Aim at visible enemy
             if (closestVisibleEnemy != null)
             {
-                LastEnemySpotTime = DateTime.Now;
+                LastStoppedTime = DateTime.Now;
 
                 SetCurrentColor(isShooting: true);
                 RotateTowardsGameObject(closestVisibleEnemy);
@@ -99,7 +118,7 @@ namespace Assets.Scripts.NPC
 
         private void FixedUpdate()
         {
-            if (Target != null && DateTime.Now.Subtract(LastEnemySpotTime).Milliseconds > MinTimeBetweenMovementAfterSpotMs)
+            if (Target != null && DateTime.Now.Subtract(LastStoppedTime).TotalMilliseconds > MinTimeBetweenMovementMs)
             {
                 Agent.SetDestination(Target.position);
                 if (Agent.remainingDistance > Agent.stoppingDistance)
@@ -107,6 +126,41 @@ namespace Assets.Scripts.NPC
                     transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
                     transform.rotation *= Quaternion.Euler(0f, 0f, 90);
                 }
+                else
+                {
+                    LastStoppedTime = DateTime.Now;
+                }
+            }
+            else
+            {
+                SetTarget();
+            }
+        }
+
+        private void SetTarget()
+        {
+            // Follow player
+            if (Target == null && MustFollowPlayer)
+            {
+                var player = GameObject.Find(ObjectNames.Player);
+                if (player != null)
+                {
+                    Target = player.transform;
+                }
+            }
+            // Go to Points-of-Interest
+            else if (PointsOfInterest?.Any() ?? false)
+            {
+                Transform newTarget = null;
+
+                do
+                {
+                    int randomValue = (int)(Random.value * 100);
+                    newTarget = PointsOfInterest.ElementAt(randomValue % PointsOfInterest.Count);
+                }
+                while (newTarget == Target);
+
+                Target = newTarget;
             }
         }
 
@@ -130,7 +184,7 @@ namespace Assets.Scripts.NPC
             if (CanShoot())
             {
                 float bulletTargetAngle = Rigidbody.rotation;
-                CurrentWeapon.Shoot(bulletTargetAngle);
+                CurrentWeapon.Shoot(bulletTargetAngle, Team);
             }
         }
 
@@ -213,6 +267,8 @@ namespace Assets.Scripts.NPC
                 green *= greenForYellowMix;
                 blue *= blueForYellowMix;
             }
+
+            // TODO - Add a red tint to enemies, green for allies
 
             gameObject.GetComponent<SpriteRenderer>().color = new Color(1, green, blue);
         }
