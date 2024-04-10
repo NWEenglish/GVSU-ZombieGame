@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.HUD;
 using Assets.Scripts.NPC;
+using Assets.Scripts.Player;
 using Assets.Scripts.Spawners;
 using TMPro;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace Assets.Scripts.GeneralGameLogic
         public override GameModeType GameMode => GameModeType.NonZombieMode;
 
         private int MaxBotsPerTeam => 5;
-        private int TargetPoints => 5000;
+        private int TargetPoints => 7500;
         private int PointsPerKill => 100;
 
         private int MaxFriendlyBots => MaxBotsPerTeam - 1;
@@ -35,6 +36,8 @@ namespace Assets.Scripts.GeneralGameLogic
 
         private TeamPointsHUD LivesHUD;
         private TimerHUD TimerHUD;
+        private GameOverHUD GameOverHUD;
+        private PlayerLogic PlayerLogic;
 
         private bool GameStarted = false;
 
@@ -54,8 +57,15 @@ namespace Assets.Scripts.GeneralGameLogic
             BaseStart();
 
             PointsOfInterest = GameObject.Find(ObjectNames.PointsOfInterest).GetComponentsInChildren<Transform>().ToList();
+
+            PlayerLogic = GameObject.Find(ObjectNames.Player).GetComponent<PlayerLogic>();
             LivesHUD = new TeamPointsHUD(GameObject.Find(ObjectNames.Team_Points_HUD).GetComponent<TextMeshProUGUI>());
             TimerHUD = new TimerHUD(GameObject.Find(ObjectNames.Timer_HUD).GetComponent<TextMeshProUGUI>());
+            GameOverHUD = new GameOverHUD()
+            {
+                GameOverTitle = GameObject.Find(ObjectNames.GameOver_Title).GetComponent<TextMeshProUGUI>(),
+                GameOverSubtext = GameObject.Find(ObjectNames.GameOver_Subtext).GetComponent<TextMeshProUGUI>()
+            };
 
             var spawners = GameObject.Find(ObjectNames.InitialSpawnHolder).GetComponentsInChildren<Transform>().ToList();
             foreach (Transform t in spawners)
@@ -98,10 +108,19 @@ namespace Assets.Scripts.GeneralGameLogic
                 // Update HUDs
                 LivesHUD.UpdateHUD(TeamPoints[TeamType.PlayerTeam], TeamPoints[TeamType.HostileTeam], TargetPoints);
             }
+
             // Game over
-            else if (IsGameOver())
+            if (IsGameOver())
             {
-                // TODO
+                GameOutcome outcome = FindGameOutcome();
+                GameOverHUD.ShowNonZombiesGameOver(outcome);
+
+                PlayerLogic.Disable();
+                List<GameObject> allBots = GameObject.FindGameObjectsWithTag(TagNames.NPC).ToList();
+                foreach (GameObject bot in allBots)
+                {
+                    bot.GetComponent<HumanLogic>().Disable();
+                }
             }
 
             // Update timer
@@ -110,6 +129,29 @@ namespace Assets.Scripts.GeneralGameLogic
                 TimerMs -= Time.deltaTime * 1000f;
                 TimerHUD.UpdateHUD(TimerMs.Value);
             }
+        }
+
+        private GameOutcome FindGameOutcome()
+        {
+            GameOutcome retOutcome;
+
+            // Won
+            if (TeamPoints[TeamType.PlayerTeam] > TeamPoints[TeamType.HostileTeam])
+            {
+                retOutcome = GameOutcome.Won;
+            }
+            // Lost
+            else if (TeamPoints[TeamType.PlayerTeam] < TeamPoints[TeamType.HostileTeam])
+            {
+                retOutcome = GameOutcome.Lost;
+            }
+            // Draw
+            else
+            {
+                retOutcome = GameOutcome.Tied;
+            }
+
+            return retOutcome;
         }
 
         private bool IsGameOver()

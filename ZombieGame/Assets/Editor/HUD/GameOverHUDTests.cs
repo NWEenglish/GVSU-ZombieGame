@@ -19,11 +19,11 @@ namespace Assets.Editor.HUD
             GameOverHUD gameOverHUD = new()
             {
                 GameOverTitle = gameOverTitle,
-                GameOverWave = gameOverWave
+                GameOverSubtext = gameOverWave
             };
 
             // Act
-            gameOverHUD.ShowGameOver(roundsSurvived);
+            gameOverHUD.ShowZombiesGameOver(roundsSurvived);
 
             // Assert
             Assert.That(gameOverWave.text.Contains(roundsSurvived.ToString()));

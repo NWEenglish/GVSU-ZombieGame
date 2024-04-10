@@ -41,6 +41,8 @@ namespace Assets.Scripts.NPC
         private DateTime LastChatterTime = DateTime.MinValue;
         private DateTime LastStoppedTime = DateTime.MinValue;
         private bool MustFollowPlayer;
+        private bool IsDisabled = false;
+        private bool IsEnabled => !IsDisabled;
         private List<Transform> PointsOfInterest;
 
         public void InitValues(List<Transform> pointsOfInterest, TeamType team)
@@ -82,53 +84,59 @@ namespace Assets.Scripts.NPC
 
         private void Update()
         {
-            CheckIfDead();
-
-            var closestVisibleEnemy = NearbyTargets
-                .Where(t => Aim.IsVisible(t))
-                .OrderBy(t => Vector2.Distance(gameObject.transform.position, t.transform.position))
-                .FirstOrDefault();
-
-            // Aim at visible enemy
-            if (closestVisibleEnemy != null)
+            if (IsEnabled)
             {
-                LastStoppedTime = DateTime.Now;
+                CheckIfDead();
 
-                SetCurrentColor(isShooting: true);
-                RotateTowardsGameObject(closestVisibleEnemy);
-                AttemptToShoot();
-                AttemptCombatChatter();
-            }
-            else
-            {
-                SetCurrentColor(isShooting: false);
-            }
+                var closestVisibleEnemy = NearbyTargets
+                    .Where(t => Aim.IsVisible(t))
+                    .OrderBy(t => Vector2.Distance(gameObject.transform.position, t.transform.position))
+                    .FirstOrDefault();
 
-            // Check if needs reload
-            if (CurrentWeapon.RemainingClipAmmo == 0)
-            {
-                CurrentWeapon.Reload();
+                // Aim at visible enemy
+                if (closestVisibleEnemy != null)
+                {
+                    LastStoppedTime = DateTime.Now;
+
+                    SetCurrentColor(isShooting: true);
+                    RotateTowardsGameObject(closestVisibleEnemy);
+                    AttemptToShoot();
+                    AttemptCombatChatter();
+                }
+                else
+                {
+                    SetCurrentColor(isShooting: false);
+                }
+
+                // Check if needs reload
+                if (CurrentWeapon.RemainingClipAmmo == 0)
+                {
+                    CurrentWeapon.Reload();
+                }
             }
         }
 
         private void FixedUpdate()
         {
-            if (Target != null && DateTime.Now.Subtract(LastStoppedTime).TotalMilliseconds > MinTimeBetweenMovementMs)
+            if (IsEnabled)
             {
-                Agent.SetDestination(Target.position);
-                if (Agent.remainingDistance > Agent.stoppingDistance)
+                if (Target != null && DateTime.Now.Subtract(LastStoppedTime).TotalMilliseconds > MinTimeBetweenMovementMs)
                 {
-                    transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
-                    transform.rotation *= Quaternion.Euler(0f, 0f, 90);
+                    Agent.SetDestination(Target.position);
+                    if (Agent.remainingDistance > Agent.stoppingDistance)
+                    {
+                        transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
+                        transform.rotation *= Quaternion.Euler(0f, 0f, 90);
+                    }
+                    else
+                    {
+                        LastStoppedTime = DateTime.Now;
+                    }
                 }
                 else
                 {
-                    LastStoppedTime = DateTime.Now;
+                    SetTarget();
                 }
-            }
-            else
-            {
-                SetTarget();
             }
         }
 
@@ -288,6 +296,12 @@ namespace Assets.Scripts.NPC
         {
             Health -= damage;
             AttemptScream();
+        }
+
+        public void Disable()
+        {
+            IsDisabled = true;
+            Agent.isStopped = true;
         }
     }
 }

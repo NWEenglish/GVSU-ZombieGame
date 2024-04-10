@@ -34,6 +34,9 @@ namespace Assets.Scripts.Player
         private GameOverHUD GameOverScreen;
         private BaseGameModeLogic GameModeLogic;
 
+        private bool IsDisabled = false;
+        private bool IsEnabled => !IsDisabled;
+
         private const float PlayerWalkingSpeed = 5f;
         private const float PlayerSprintSpeed = PlayerWalkingSpeed * 2;
         private const float PlayerReloadSpeed = PlayerWalkingSpeed / 2;
@@ -69,7 +72,7 @@ namespace Assets.Scripts.Player
             GameOverScreen = new GameOverHUD()
             {
                 GameOverTitle = GameObject.Find(ObjectNames.GameOver_Title).GetComponent<TextMeshProUGUI>(),
-                GameOverWave = GameObject.Find(ObjectNames.GameOver_Subtext).GetComponent<TextMeshProUGUI>()
+                GameOverSubtext = GameObject.Find(ObjectNames.GameOver_Subtext).GetComponent<TextMeshProUGUI>()
             };
 
             ZombieModeSetup();
@@ -98,25 +101,31 @@ namespace Assets.Scripts.Player
 
         private void FixedUpdate()
         {
-            Move();
-            Rotate();
+            if (IsEnabled)
+            {
+                Move();
+                Rotate();
+            }
         }
 
         private void Update()
         {
-            PurchaseWeapons();
-            PurchaseSupport();
-            SwitchWeapons();
-            ShootUpdate();
-            ReloadLogic();
-
-            Status.Update(IsMoving, IsSprinting);
-            AmmoHUD.UpdateHUD(CurrentWeapon.RemainingClipAmmo, CurrentWeapon.RemainingTotalAmmo);
-            HealthHUD.UpdateHUD(Status.Health);
-
-            if (PointsHUD != null)
+            if (IsEnabled)
             {
-                PointsHUD.UpdateHUD(Status.Points);
+                PurchaseWeapons();
+                PurchaseSupport();
+                SwitchWeapons();
+                ShootUpdate();
+                ReloadLogic();
+
+                Status.Update(IsMoving, IsSprinting);
+                AmmoHUD.UpdateHUD(CurrentWeapon.RemainingClipAmmo, CurrentWeapon.RemainingTotalAmmo);
+                HealthHUD.UpdateHUD(Status.Health);
+
+                if (PointsHUD != null)
+                {
+                    PointsHUD.UpdateHUD(Status.Points);
+                }
             }
         }
 
@@ -161,7 +170,7 @@ namespace Assets.Scripts.Player
                 if (GameModeLogic.GameMode == GameModeType.ZombieMode)
                 {
                     Destroy(gameObject);
-                    GameOverScreen.ShowGameOver(GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Wave);
+                    GameOverScreen.ShowZombiesGameOver(GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Wave);
                 }
                 else
                 {
@@ -291,6 +300,12 @@ namespace Assets.Scripts.Player
             CurrentWeapon.Equip(gameObject);
             Destroy(gameObject.GetComponent<PolygonCollider2D>());
             gameObject.AddComponent<PolygonCollider2D>();
+        }
+
+        public void Disable()
+        {
+            IsDisabled = true;
+            Body.velocity = new Vector2(0, 0);
         }
     }
 }
