@@ -24,6 +24,7 @@
         public const string Health_Indicator_HUD = "Health Indicator";
         public const string Health_Panel_HUD = "Health Panel";
         public const string Respawn_Panel_HUD = "Respawn Panel";
+        public const string Respawn_Message_HUD = "Respawn Message";
         public const string Points_HUD = "Points HUD";
         public const string Team_Points_HUD = "Team Points HUD";
         public const string Timer_HUD = "Timer HUD";

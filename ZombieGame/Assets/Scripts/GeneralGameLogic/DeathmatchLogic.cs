@@ -36,13 +36,14 @@ namespace Assets.Scripts.GeneralGameLogic
         private List<GameObject> FriendlyBots = new List<GameObject>();
         private List<GameObject> HostileBots = new List<GameObject>();
 
-        private const double MaxGameTimeMin = 1; // 5mins
+        private const double MaxGameTimeMin = 5;
         private float? TimerMs = null;
 
         private TeamPointsHUD LivesHUD;
         private TimerHUD TimerHUD;
         private GameOverHUD GameOverHUD;
-        private RespawnHUD RespawnHUD;
+        private Image RespawnPanel;
+        private TextMeshProUGUI RespawnMessage;
         private PlayerLogic PlayerLogic;
 
         private bool GameStarted = false;
@@ -68,9 +69,8 @@ namespace Assets.Scripts.GeneralGameLogic
 
             PointsOfInterest = GameObject.Find(ObjectNames.PointsOfInterest).GetComponentsInChildren<Transform>().ToList();
 
-
-            var blinker = new BlinkHelper(GameObject.Find(ObjectNames.Respawn_Panel_HUD).GetComponent<Image>(), Color.black, PlayerRespawnCounterSec);
-            RespawnHUD = new RespawnHUD(GameObject.Find(ObjectNames.Respawn_Panel_HUD).GetComponent<Image>(), blinker);
+            RespawnPanel = GameObject.Find(ObjectNames.Respawn_Panel_HUD).GetComponent<Image>();
+            RespawnMessage = GameObject.Find(ObjectNames.Respawn_Message_HUD).GetComponent<TextMeshProUGUI>();
 
             PlayerLogic = GameObject.Find(ObjectNames.Player).GetComponent<PlayerLogic>();
             LivesHUD = new TeamPointsHUD(GameObject.Find(ObjectNames.Team_Points_HUD).GetComponent<TextMeshProUGUI>());
@@ -130,6 +130,16 @@ namespace Assets.Scripts.GeneralGameLogic
             // Game over
             if (IsGameOver() && !RanGameOverLogic)
             {
+                // If respawning, just hide the message, else gray out the screen.
+                if (PlayerInProcessOfRespawning)
+                {
+                    RespawnMessage.color = Color.clear;
+                }
+                else
+                {
+                    RespawnPanel.color = new Color(0, 0, 0, 0.25f);
+                }
+
                 RanGameOverLogic = true;
 
                 GameOutcome outcome = FindGameOutcome();
@@ -228,7 +238,8 @@ namespace Assets.Scripts.GeneralGameLogic
             if (wasKilled)
             {
                 // Black out screen, start timer
-                //RespawnHUD.TriggerStart();
+                RespawnPanel.color = Color.black;
+                RespawnMessage.color = Color.white;
 
                 // Move off map
                 Vector3 hidingSpot = Vector3.zero;
@@ -255,6 +266,9 @@ namespace Assets.Scripts.GeneralGameLogic
                 SpawnerLogic spawner = GetRandomSpawner();
                 PlayerLogic.gameObject.transform.position = spawner.Position;
                 PlayerLogic.Enable();
+
+                RespawnPanel.color = Color.clear;
+                RespawnMessage.color = Color.clear;
             }
             else
             {
