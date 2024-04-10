@@ -161,7 +161,7 @@ namespace Assets.Scripts.NPC
 
         private void AttemptCombatChatter()
         {
-            if (!Scream.isPlaying && !Chatter.Any(audio => audio.isPlaying))
+            if (Team == TeamType.PlayerTeam && !Scream.isPlaying && !Chatter.Any(audio => audio.isPlaying))
             {
                 // Time out completed and now checking for chance for bots to have chatter.
                 if (DateTime.Now.Subtract(LastChatterTime).TotalSeconds > MinTimeBetweenChatter
@@ -247,25 +247,37 @@ namespace Assets.Scripts.NPC
             }
         }
 
+        // Unity color reference: https://docs.unity3d.com/ScriptReference/Color.html
         private void SetCurrentColor(bool isShooting)
         {
-            // Per Unity: Color.Yellow RGBA is (1, 0.92, 0.016, 1)
-            float greenForYellowMix = 0.92f;
-            float blueForYellowMix = 0.016f;
+            Color color;
 
-            float colorRatio = Health / 100f;
-            float green = colorRatio;
-            float blue = colorRatio;
-
-            if (isShooting)
+            // Friendlies are "normal" color
+            if (Team == TeamType.PlayerTeam)
             {
-                green *= greenForYellowMix;
-                blue *= blueForYellowMix;
+                // Per Unity: Color.Yellow RGBA is (1, 0.92, 0.016, 1)
+                float greenForYellowMix = 0.92f;
+                float blueForYellowMix = 0.016f;
+
+                float colorRatio = Health / 100f;
+                float green = colorRatio;
+                float blue = colorRatio;
+
+                if (isShooting)
+                {
+                    green *= greenForYellowMix;
+                    blue *= blueForYellowMix;
+                }
+
+                color = new Color(1, green, blue);
+            }
+            else
+            {
+                // Per Unity: Color.Black RGBA is (0, 0, 0, 1)
+                color = new Color(0, 0, 0);
             }
 
-            // TODO - Add a red tint to enemies, green for allies
-
-            gameObject.GetComponent<SpriteRenderer>().color = new Color(1, green, blue);
+            gameObject.GetComponent<SpriteRenderer>().color = color;
         }
     }
 }
