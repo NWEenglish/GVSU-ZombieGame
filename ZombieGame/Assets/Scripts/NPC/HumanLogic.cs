@@ -227,8 +227,19 @@ namespace Assets.Scripts.NPC
         {
             Health -= 15;
 
-            // Chance to scream when hit
-            if (!Scream.isPlaying && (int)((Random.value * 100) % 5) == 0)
+            AttemptScream();
+            SetCurrentColor(isShooting: false);
+
+            if (Health <= 0)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        private void AttemptScream()
+        {
+            // Chance to scream
+            if (Team == TeamType.PlayerTeam && !Scream.isPlaying && (int)((Random.value * 100) % 5) == 0)
             {
                 // Stop playing the other audio
                 foreach (var audioSource in Chatter)
@@ -237,13 +248,6 @@ namespace Assets.Scripts.NPC
                 }
 
                 Scream.TryPlay();
-            }
-
-            SetCurrentColor(isShooting: false);
-
-            if (Health <= 0)
-            {
-                Destroy(gameObject);
             }
         }
 
@@ -278,6 +282,12 @@ namespace Assets.Scripts.NPC
             }
 
             gameObject.GetComponent<SpriteRenderer>().color = color;
+        }
+
+        protected override void TakeHit(int damage)
+        {
+            Health -= damage;
+            AttemptScream();
         }
     }
 }

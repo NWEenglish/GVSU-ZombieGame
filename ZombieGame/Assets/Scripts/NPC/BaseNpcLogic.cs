@@ -24,6 +24,8 @@ namespace Assets.Scripts.NPC
         protected abstract int KillPoints { get; }
         protected abstract float CurrentSpeed { get; set; }
 
+        protected abstract void TakeHit(int damage);
+
         public void InitValues()
         {
             ShouldMute = false;
@@ -75,7 +77,7 @@ namespace Assets.Scripts.NPC
         {
             if (collision.gameObject.HasComponent<BulletLogic>())
             {
-                Health -= collision.gameObject.GetComponent<BulletLogic>().Damage;
+                TakeHit(collision.gameObject.GetComponent<BulletLogic>().Damage);
             }
         }
     }

@@ -25,6 +25,7 @@
         public const string Health_Panel_HUD = "Health Panel";
         public const string Points_HUD = "Points HUD";
         public const string Team_Points_HUD = "Team Points HUD";
+        public const string Timer_HUD = "Timer HUD";
         public const string Seed_HUD = "Seed HUD";
         public const string Wave_HUD = "Wave HUD";
 

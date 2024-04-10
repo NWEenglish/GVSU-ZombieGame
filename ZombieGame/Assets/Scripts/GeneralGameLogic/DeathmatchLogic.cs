@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
@@ -17,6 +18,7 @@ namespace Assets.Scripts.GeneralGameLogic
 
         private int MaxBotsPerTeam => 5;
         private int TargetPoints => 5000;
+        private int PointsPerKill => 100;
 
         private int MaxFriendlyBots => MaxBotsPerTeam - 1;
         private int MaxHostileBots => MaxBotsPerTeam;
@@ -28,12 +30,18 @@ namespace Assets.Scripts.GeneralGameLogic
         private List<GameObject> FriendlyBots = new List<GameObject>();
         private List<GameObject> HostileBots = new List<GameObject>();
 
+        private const double MaxGameTimeMin = 1.5;
+        private float? TimerMs = null;
+
         private TeamPointsHUD LivesHUD;
+        private TimerHUD TimerHUD;
 
         private bool GameStarted = false;
 
         private void Awake()
         {
+            TimerMs = float.Parse(TimeSpan.FromMinutes(MaxGameTimeMin).TotalMilliseconds.ToString());
+
             TeamPoints = new Dictionary<TeamType, int>()
             {
                 { TeamType.PlayerTeam, 0 },
@@ -47,6 +55,7 @@ namespace Assets.Scripts.GeneralGameLogic
 
             PointsOfInterest = GameObject.Find(ObjectNames.PointsOfInterest).GetComponentsInChildren<Transform>().ToList();
             LivesHUD = new TeamPointsHUD(GameObject.Find(ObjectNames.Team_Points_HUD).GetComponent<TextMeshProUGUI>());
+            TimerHUD = new TimerHUD(GameObject.Find(ObjectNames.Timer_HUD).GetComponent<TextMeshProUGUI>());
 
             var spawners = GameObject.Find(ObjectNames.InitialSpawnHolder).GetComponentsInChildren<Transform>().ToList();
             foreach (Transform t in spawners)
@@ -69,18 +78,54 @@ namespace Assets.Scripts.GeneralGameLogic
 
         private void Update()
         {
+            // Game in-progress
             if (GameStarted)
             {
                 // Update Points
-                TeamPoints[TeamType.PlayerTeam] += HostileBots.RemoveAll(bot => bot == null) * 100;
-                TeamPoints[TeamType.HostileTeam] += FriendlyBots.RemoveAll(bot => bot == null) * 100;
+                TeamPoints[TeamType.PlayerTeam] += HostileBots.RemoveAll(bot => bot == null) * PointsPerKill;
+                TeamPoints[TeamType.HostileTeam] += FriendlyBots.RemoveAll(bot => bot == null) * PointsPerKill;
 
-                TryRespawnPlayer();
+                // If player was killed, respawn and award points
+                if (TryRespawnPlayer())
+                {
+                    TeamPoints[TeamType.HostileTeam] += PointsPerKill;
+                }
+
+                // Attempt bot respawns
                 TryRespawnBots(FriendlyBots.Count, MaxFriendlyBots, TeamType.PlayerTeam);
                 TryRespawnBots(HostileBots.Count, MaxHostileBots, TeamType.HostileTeam);
 
+                // Update HUDs
                 LivesHUD.UpdateHUD(TeamPoints[TeamType.PlayerTeam], TeamPoints[TeamType.HostileTeam], TargetPoints);
             }
+            // Game over
+            else if (IsGameOver())
+            {
+                // TODO
+            }
+
+            // Update timer
+            if (TimerMs.HasValue)
+            {
+                TimerMs -= Time.deltaTime * 1000f;
+                TimerHUD.UpdateHUD(TimerMs.Value);
+            }
+        }
+
+        private bool IsGameOver()
+        {
+            bool retIsGameOver = false;
+
+            if (TimerMs.HasValue && TimerMs.Value < 0f)
+            {
+                retIsGameOver = true;
+            }
+            else if (TeamPoints.Any(kvp => kvp.Value >= TargetPoints))
+            {
+                retIsGameOver = true;
+            }
+
+            return retIsGameOver;
         }
 
         private bool TryRespawnPlayer()

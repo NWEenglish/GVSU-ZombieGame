@@ -16,15 +16,15 @@ namespace Assets.Scripts.HUD
             string gameStatus;
             if (friendlyTeamPoints > hostileTeamPoints)
             {
-                gameStatus = "Winning";
+                gameStatus = "<b><color=green>Winning</color></b>";
             }
             else if (friendlyTeamPoints < hostileTeamPoints)
             {
-                gameStatus = "Losing";
+                gameStatus = "<b><color=red>Losing</color></b>";
             }
             else
             {
-                gameStatus = "Tie";
+                gameStatus = "<b><color=orange>Tie</color></b>";
             }
 
             var text = $"{gameStatus}\n{friendlyTeamPoints} / {targetPoints}\n{hostileTeamPoints} / {targetPoints}";
