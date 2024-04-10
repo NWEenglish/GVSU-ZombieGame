@@ -26,7 +26,7 @@ namespace Assets.Scripts.Player
             }
             else
             {
-                // Player has died
+                // TODO - Player has died - follow another entity?
 
             }
 

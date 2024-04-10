@@ -5,6 +5,7 @@
         public const string Bullet = "Bullet";
         public const string Beam = "Beam";
         public const string Pistol = "Pistol";
+        public const string Rifle = "Rifle";
 
         public const string GameLogic = "General Game Logic";
         public const string SpawnerHolder = "Spawner Holder";

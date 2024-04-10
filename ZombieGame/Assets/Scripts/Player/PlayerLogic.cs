@@ -140,8 +140,16 @@ namespace Assets.Scripts.Player
             if (Status.Health <= 0)
             {
                 _logger.LogDebug($"Player has died. | PlayerHealth: {Status.Health}");
-                Destroy(gameObject);
-                GameOverScreen.ShowGameOver(GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Wave);
+
+                if (GameModeLogic.GameMode == GameModeType.ZombieMode)
+                {
+                    Destroy(gameObject);
+                    GameOverScreen.ShowGameOver(GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Wave);
+                }
+                else
+                {
+                    // TODO Eligible for respawn..?
+                }
             }
 
             HealthHUD.DisplayHit();

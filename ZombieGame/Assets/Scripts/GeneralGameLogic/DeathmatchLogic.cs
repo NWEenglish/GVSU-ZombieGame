@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.NPC;
-using Assets.Scripts.Singletons;
 using Assets.Scripts.Spawners;
-using Assets.Scripts.Stores;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.GeneralGameLogic
@@ -19,16 +13,20 @@ namespace Assets.Scripts.GeneralGameLogic
     {
         public override GameModeType GameMode => GameModeType.NonZombieMode;
 
-        private int maxFriendlyBots => 4;
-        private int maxHostileBots => 5;
+        private int MaxTeamLives => 5;
+        private int MaxBotsPerTeam => 5;
+
+        private int MaxFriendlyBots => MaxBotsPerTeam - 1;
+        private int MaxHostileBots => MaxBotsPerTeam;
 
         private Dictionary<Transform, InitialSpawnerLogic> InitialSpawners = new Dictionary<Transform, InitialSpawnerLogic>();
+        private Dictionary<TeamType, int> TeamLives;
         private List<Transform> PointsOfInterest = new List<Transform>();
 
         private List<GameObject> FriendlyBots = new List<GameObject>();
         private List<GameObject> HostileBots = new List<GameObject>();
 
-        private bool GameStarted;
+        private bool GameStarted = false;
 
         private void Start()
         {
@@ -52,6 +50,12 @@ namespace Assets.Scripts.GeneralGameLogic
                 UpdateBotLists(bot, team);
             }
 
+            TeamLives = new Dictionary<TeamType, int>()
+            {
+                { TeamType.PlayerTeam, MaxTeamLives },
+                { TeamType.HostileTeam, MaxTeamLives }
+            };
+
             GameStarted = true;
         }
 
@@ -59,12 +63,31 @@ namespace Assets.Scripts.GeneralGameLogic
         {
             if (GameStarted)
             {
-                FriendlyBots.RemoveAll(bot => bot == null);
-                HostileBots.RemoveAll(bot => bot == null);
+                TeamLives[TeamType.PlayerTeam] -= FriendlyBots.RemoveAll(bot => bot == null);
+                TeamLives[TeamType.HostileTeam] -= HostileBots.RemoveAll(bot => bot == null);
 
-                RespawnBots(FriendlyBots.Count, maxFriendlyBots, TeamType.PlayerTeam);
-                RespawnBots(HostileBots.Count, maxHostileBots, TeamType.HostileTeam);
+                if (TeamLives[TeamType.PlayerTeam] > 0)
+                {
+                    // Player has priority for respawning
+                    if (TryRespawnPlayer())
+                    {
+                        TeamLives[TeamType.PlayerTeam]--;
+                    }
+                    else
+                    {
+                        RespawnBots(FriendlyBots.Count, MaxFriendlyBots, TeamType.PlayerTeam);
+                    }
+                }
+                if (TeamLives[TeamType.HostileTeam] > 0)
+                {
+                    RespawnBots(HostileBots.Count, MaxHostileBots, TeamType.HostileTeam);
+                }
             }
+        }
+
+        private bool TryRespawnPlayer()
+        {
+            return false;
         }
 
         private void RespawnBots(int currentBots, int maxBots, TeamType team)
