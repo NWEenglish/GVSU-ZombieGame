@@ -57,7 +57,6 @@ namespace Assets.Scripts.Player
             GameModeLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
 
             AmmoHUD = new AmmoHUD(GameObject.Find(ObjectNames.Ammo_HUD).GetComponent<TextMeshProUGUI>());
-            PointsHUD = new PointsHUD(GameObject.Find(ObjectNames.Points_HUD).GetComponent<TextMeshProUGUI>());
 
             var healthBlink = new BlinkHelper(GameObject.Find(ObjectNames.Health_Indicator_HUD).GetComponent<Image>(), Color.red, HealthBlinkTime);
             HealthHUD = new HealthHUD(GameObject.Find(ObjectNames.Health_Panel_HUD).GetComponent<Image>(), healthBlink, Status.MaxHealth);
@@ -67,20 +66,34 @@ namespace Assets.Scripts.Player
                 GameObject.Find(ObjectNames.Pistol).GetComponent<BasePlayer>().Weapon
             };
 
-            if (GameModeLogic.GameMode == GameModeType.NonZombieMode)
-            {
-                Weapons.Add(GameObject.Find(ObjectNames.Rifle).GetComponent<BasePlayer>().Weapon);
-                Weapons.Reverse();
-            }
-
             GameOverScreen = new GameOverHUD()
             {
                 GameOverTitle = GameObject.Find(ObjectNames.GameOver_Title).GetComponent<TextMeshProUGUI>(),
                 GameOverWave = GameObject.Find(ObjectNames.GameOver_Subtext).GetComponent<TextMeshProUGUI>()
             };
 
+            ZombieModeSetup();
+            NonZombieModeSetup();
+
             CurrentWeapon = Weapons.First();
             Equip();
+        }
+
+        private void ZombieModeSetup()
+        {
+            if (GameModeLogic.GameMode == GameModeType.ZombieMode)
+            {
+                PointsHUD = new PointsHUD(GameObject.Find(ObjectNames.Points_HUD).GetComponent<TextMeshProUGUI>());
+            }
+        }
+
+        private void NonZombieModeSetup()
+        {
+            if (GameModeLogic.GameMode == GameModeType.NonZombieMode)
+            {
+                Weapons.Add(GameObject.Find(ObjectNames.Rifle).GetComponent<BasePlayer>().Weapon);
+                Weapons.Reverse();
+            }
         }
 
         private void FixedUpdate()
@@ -100,7 +113,11 @@ namespace Assets.Scripts.Player
             Status.Update(IsMoving, IsSprinting);
             AmmoHUD.UpdateHUD(CurrentWeapon.RemainingClipAmmo, CurrentWeapon.RemainingTotalAmmo);
             HealthHUD.UpdateHUD(Status.Health);
-            PointsHUD.UpdateHUD(Status.Points);
+
+            if (PointsHUD != null)
+            {
+                PointsHUD.UpdateHUD(Status.Points);
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
