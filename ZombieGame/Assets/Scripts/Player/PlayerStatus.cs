@@ -36,11 +36,18 @@ namespace Assets.Scripts.Player
             EnergyLogic(isMoving, isSprinting);
         }
 
-        public void TakeHit()
+        public void TakeZombieHit()
         {
             Health -= 34;
             LastHealthChange = DateTime.Now;
-            _logger.LogDebug($"Player took a hit. | PlayerHealth: {Health}");
+            _logger.LogDebug($"Player took a hit from a zombie. | PlayerHealth: {Health}");
+        }
+
+        public void TakeBulletHit(int damage)
+        {
+            Health -= damage;
+            LastHealthChange = DateTime.Now;
+            _logger.LogDebug($"Player took a hit from a bullet. | PlayerHealth: {Health}");
         }
 
         public void AwardPoints(int points)
@@ -115,6 +122,12 @@ namespace Assets.Scripts.Player
 
                 LastEnergyChange = DateTime.Now;
             }
+        }
+
+        public void Reset()
+        {
+            Health = MaxHealth;
+            Energy = MaxEnergy;
         }
     }
 }

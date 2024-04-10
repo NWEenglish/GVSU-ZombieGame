@@ -301,7 +301,11 @@ namespace Assets.Scripts.NPC
         public void Disable()
         {
             IsDisabled = true;
-            Agent.isStopped = true;
+
+            if (Agent != null)
+            {
+                Agent.isStopped = true;
+            }
         }
     }
 }

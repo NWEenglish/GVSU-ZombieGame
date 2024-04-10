@@ -159,10 +159,24 @@ namespace Assets.Scripts.Player
             }
         }
 
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.TryGetComponent(out BulletLogic bulletLogic))
+            {
+                Status.TakeBulletHit(bulletLogic.Damage);
+                HandleDamage();
+            }
+        }
+
+        // Mainly used for if a zombie attacks the player
         public void Hit()
         {
-            Status.TakeHit();
+            Status.TakeZombieHit();
+            HandleDamage();
+        }
 
+        private void HandleDamage()
+        {
             if (Status.Health <= 0)
             {
                 _logger.LogDebug($"Player has died. | PlayerHealth: {Status.Health}");
@@ -174,7 +188,7 @@ namespace Assets.Scripts.Player
                 }
                 else
                 {
-                    // TODO Eligible for respawn..?
+                    _logger.LogDebug("Player is dead, but is allowed to respawning.");
                 }
             }
 
@@ -306,6 +320,21 @@ namespace Assets.Scripts.Player
         {
             IsDisabled = true;
             Body.velocity = new Vector2(0, 0);
+        }
+
+        public void Enable()
+        {
+            IsDisabled = false;
+        }
+
+        public void ResetPlayer()
+        {
+            Status.Reset();
+
+            foreach (BaseWeapon weapon in Weapons)
+            {
+                weapon.Reset();
+            }
         }
     }
 }

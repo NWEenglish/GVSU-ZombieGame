@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Extensions;
+using Assets.Scripts.Helpers;
 using Assets.Scripts.HUD;
 using Assets.Scripts.NPC;
 using Assets.Scripts.Player;
@@ -11,6 +12,7 @@ using Assets.Scripts.Spawners;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.GeneralGameLogic
@@ -22,6 +24,7 @@ namespace Assets.Scripts.GeneralGameLogic
         private int MaxBotsPerTeam => 5;
         private int TargetPoints => 7500;
         private int PointsPerKill => 100;
+        private double PlayerRespawnCounterSec => 2.5;
 
         private int MaxFriendlyBots => MaxBotsPerTeam - 1;
         private int MaxHostileBots => MaxBotsPerTeam;
@@ -33,16 +36,20 @@ namespace Assets.Scripts.GeneralGameLogic
         private List<GameObject> FriendlyBots = new List<GameObject>();
         private List<GameObject> HostileBots = new List<GameObject>();
 
-        private const double MaxGameTimeMin = 1.5;
+        private const double MaxGameTimeMin = 1; // 5mins
         private float? TimerMs = null;
 
         private TeamPointsHUD LivesHUD;
         private TimerHUD TimerHUD;
         private GameOverHUD GameOverHUD;
+        private RespawnHUD RespawnHUD;
         private PlayerLogic PlayerLogic;
 
         private bool GameStarted = false;
         private bool RanGameOverLogic = false;
+        private float? PlayerRespawnTimerMs = null;
+
+        private bool PlayerInProcessOfRespawning => PlayerRespawnTimerMs.HasValue;
 
         private void Awake()
         {
@@ -60,6 +67,10 @@ namespace Assets.Scripts.GeneralGameLogic
             BaseStart();
 
             PointsOfInterest = GameObject.Find(ObjectNames.PointsOfInterest).GetComponentsInChildren<Transform>().ToList();
+
+
+            var blinker = new BlinkHelper(GameObject.Find(ObjectNames.Respawn_Panel_HUD).GetComponent<Image>(), Color.black, PlayerRespawnCounterSec);
+            RespawnHUD = new RespawnHUD(GameObject.Find(ObjectNames.Respawn_Panel_HUD).GetComponent<Image>(), blinker);
 
             PlayerLogic = GameObject.Find(ObjectNames.Player).GetComponent<PlayerLogic>();
             LivesHUD = new TeamPointsHUD(GameObject.Find(ObjectNames.Team_Points_HUD).GetComponent<TextMeshProUGUI>());
@@ -99,9 +110,13 @@ namespace Assets.Scripts.GeneralGameLogic
                 TeamPoints[TeamType.HostileTeam] += FriendlyBots.RemoveAll(bot => bot == null) * PointsPerKill;
 
                 // If player was killed, respawn and award points
-                if (TryRespawnPlayer())
+                if (TryRespawnPlayer() && !PlayerInProcessOfRespawning)
                 {
                     TeamPoints[TeamType.HostileTeam] += PointsPerKill;
+                }
+                else if (PlayerInProcessOfRespawning)
+                {
+                    ContinuePlayerRespawnProcess();
                 }
 
                 // Attempt bot respawns
@@ -115,6 +130,8 @@ namespace Assets.Scripts.GeneralGameLogic
             // Game over
             if (IsGameOver() && !RanGameOverLogic)
             {
+                RanGameOverLogic = true;
+
                 GameOutcome outcome = FindGameOutcome();
                 PlayMusic(outcome);
                 GameOverHUD.ShowNonZombiesGameOver(outcome);
@@ -125,8 +142,6 @@ namespace Assets.Scripts.GeneralGameLogic
                 {
                     bot.GetComponent<HumanLogic>().Disable();
                 }
-
-                RanGameOverLogic = true;
             }
 
             if (RanGameOverLogic)
@@ -208,29 +223,71 @@ namespace Assets.Scripts.GeneralGameLogic
 
         private bool TryRespawnPlayer()
         {
-            return false;
+            bool wasKilled = PlayerLogic.Status.IsPlayerDead;
+
+            if (wasKilled)
+            {
+                // Black out screen, start timer
+                //RespawnHUD.TriggerStart();
+
+                // Move off map
+                Vector3 hidingSpot = Vector3.zero;
+                hidingSpot.x = 1000f;
+                PlayerLogic.gameObject.transform.position = hidingSpot;
+
+                // Reset health and weapons
+                PlayerLogic.ResetPlayer();
+                PlayerLogic.Disable();
+
+                // Set timer to 5 seconds
+                PlayerRespawnTimerMs = (float)TimeSpan.FromSeconds(5).TotalMilliseconds;
+            }
+
+            return wasKilled;
+        }
+
+        private void ContinuePlayerRespawnProcess()
+        {
+            // Move to respawn points and remove black screen.
+            if (PlayerRespawnTimerMs < 0f)
+            {
+                PlayerRespawnTimerMs = null;
+                SpawnerLogic spawner = GetRandomSpawner();
+                PlayerLogic.gameObject.transform.position = spawner.Position;
+                PlayerLogic.Enable();
+            }
+            else
+            {
+                PlayerRespawnTimerMs -= Time.deltaTime * 1000f;
+            }
         }
 
         private void TryRespawnBots(int currentBots, int maxBots, TeamType team)
         {
             for (int i = currentBots; i < maxBots; i++)
             {
-                // Pick Random Location
-                SpawnerLogic spawner = null;
-                while (spawner == null)
-                {
-                    int randomValue = (int)((Random.value * 100) % Spawners.Count);
-                    spawner = Spawners[randomValue];
-
-                    if (!spawner.CanSpawn)
-                    {
-                        spawner = null;
-                    }
-                }
-
+                SpawnerLogic spawner = GetRandomSpawner();
                 GameObject bot = Spawn(spawner.transform.position, team);
                 UpdateBotLists(bot, team);
             }
+        }
+
+        private SpawnerLogic GetRandomSpawner()
+        {
+            // Pick Random Location
+            SpawnerLogic retSpawner = null;
+            while (retSpawner == null)
+            {
+                int randomValue = (int)((Random.value * 100) % Spawners.Count);
+                retSpawner = Spawners[randomValue];
+
+                if (!retSpawner.CanSpawn)
+                {
+                    retSpawner = null;
+                }
+            }
+
+            return retSpawner;
         }
 
         private GameObject Spawn(Vector3 position, TeamType team)

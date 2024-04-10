@@ -24,11 +24,6 @@ namespace Assets.Scripts.Player
                 Vector3 targetPosition = Player.transform.transform.position;
                 gameObject.transform.position = new Vector3(targetPosition.x, targetPosition.y, targetPosition.z - CameraHeight);
             }
-            else
-            {
-                // TODO - Player has died - follow another entity?
-
-            }
 
             if (PlayerHitEsc)
             {

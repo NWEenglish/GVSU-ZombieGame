@@ -37,7 +37,7 @@ namespace Assets.Editor.Player
 
             for (int hits = 0; hits < numberOfHits; hits++)
             {
-                playerStatus.TakeHit();
+                playerStatus.TakeZombieHit();
             }
 
             // Act
@@ -73,7 +73,7 @@ namespace Assets.Editor.Player
             double secondsToWait = 2;
 
             PlayerStatus playerStatus = new();
-            playerStatus.TakeHit();
+            playerStatus.TakeZombieHit();
             int startingHealth = playerStatus.Health;
             DateTime startingTime = DateTime.Now;
 
@@ -96,7 +96,7 @@ namespace Assets.Editor.Player
             PlayerStatus playerStatus = new();
 
             // Act
-            playerStatus.TakeHit();
+            playerStatus.TakeZombieHit();
 
             // Assert
             Assert.AreEqual(expectedHealth, playerStatus.Health);

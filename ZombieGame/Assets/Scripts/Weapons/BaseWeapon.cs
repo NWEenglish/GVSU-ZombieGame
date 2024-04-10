@@ -91,6 +91,12 @@ namespace Assets.Scripts.Weapons
             player.GetComponent<SpriteRenderer>().sprite = Sprite;
         }
 
+        public void Reset()
+        {
+            RemainingClipAmmo = ClipSize;
+            RemainingTotalAmmo = StartingAmmo;
+        }
+
         internal void EnableUnlimitedAmmo(GameObject requestingGameObject)
         {
             if (requestingGameObject?.tag == TagNames.NPC)

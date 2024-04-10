@@ -25,17 +25,17 @@ namespace Assets.Scripts.HUD
             if (outcome == GameOutcome.Won)
             {
                 GameOverTitle.text = "VICTORY!";
-                GameOverSubtext.text = "You're work is appreciated. Well done.";
+                GameOverSubtext.text = "You're work is appreciated\nWell done";
             }
             else if (outcome == GameOutcome.Lost)
             {
                 GameOverTitle.text = "DEFEAT!";
-                GameOverSubtext.text = "Mission failed. We'll get them next time.";
+                GameOverSubtext.text = "Mission failed\nWe'll get them next time";
             }
             else
             {
-                GameOverTitle.text = "It's a draw, stand-down";
-                GameOverSubtext.text = "We're out of time. Regroup and try again.";
+                GameOverTitle.text = "It's a draw\nStand-down";
+                GameOverSubtext.text = "Regroup and try again";
             }
         }
     }
