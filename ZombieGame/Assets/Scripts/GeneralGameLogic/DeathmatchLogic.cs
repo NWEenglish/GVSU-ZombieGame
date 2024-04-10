@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Extensions;
 using Assets.Scripts.HUD;
 using Assets.Scripts.NPC;
 using Assets.Scripts.Player;
 using Assets.Scripts.Spawners;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.GeneralGameLogic
@@ -40,6 +42,7 @@ namespace Assets.Scripts.GeneralGameLogic
         private PlayerLogic PlayerLogic;
 
         private bool GameStarted = false;
+        private bool RanGameOverLogic = false;
 
         private void Awake()
         {
@@ -89,7 +92,7 @@ namespace Assets.Scripts.GeneralGameLogic
         private void Update()
         {
             // Game in-progress
-            if (GameStarted)
+            if (GameStarted && !RanGameOverLogic)
             {
                 // Update Points
                 TeamPoints[TeamType.PlayerTeam] += HostileBots.RemoveAll(bot => bot == null) * PointsPerKill;
@@ -110,9 +113,10 @@ namespace Assets.Scripts.GeneralGameLogic
             }
 
             // Game over
-            if (IsGameOver())
+            if (IsGameOver() && !RanGameOverLogic)
             {
                 GameOutcome outcome = FindGameOutcome();
+                PlayMusic(outcome);
                 GameOverHUD.ShowNonZombiesGameOver(outcome);
 
                 PlayerLogic.Disable();
@@ -121,6 +125,18 @@ namespace Assets.Scripts.GeneralGameLogic
                 {
                     bot.GetComponent<HumanLogic>().Disable();
                 }
+
+                RanGameOverLogic = true;
+            }
+
+            if (RanGameOverLogic)
+            {
+                // If an additional 15secs have elapsed, return to main menu
+                double seconds = TimeSpan.FromMilliseconds(Math.Abs(TimerMs.Value)).TotalSeconds;
+                if (seconds > 15)
+                {
+                    SceneManager.LoadScene(SceneNames.MainMenu);
+                }
             }
 
             // Update timer
@@ -128,6 +144,26 @@ namespace Assets.Scripts.GeneralGameLogic
             {
                 TimerMs -= Time.deltaTime * 1000f;
                 TimerHUD.UpdateHUD(TimerMs.Value);
+            }
+        }
+
+        private void PlayMusic(GameOutcome outcome)
+        {
+            int index = outcome switch
+            {
+                GameOutcome.Lost => 1,
+                GameOutcome.Tied => 2,
+                GameOutcome.Won => 3,
+                _ => throw new NotImplementedException("The game outcome is not supported.")
+            };
+
+            AudioSource song = gameObject.GetComponents<AudioSource>()[index];
+            AudioSource ambiance = gameObject.GetComponents<AudioSource>()[0];
+
+            if (song != null && !song.isPlaying)
+            {
+                ambiance.Stop();
+                song.TryPlay();
             }
         }
 
