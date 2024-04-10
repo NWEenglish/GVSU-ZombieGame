@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
@@ -31,6 +32,7 @@ namespace Assets.Scripts.Player
         private HealthHUD HealthHUD;
         private PointsHUD PointsHUD;
         private GameOverHUD GameOverScreen;
+        private BaseGameModeLogic GameModeLogic;
 
         private const float PlayerWalkingSpeed = 5f;
         private const float PlayerSprintSpeed = PlayerWalkingSpeed * 2;
@@ -52,6 +54,8 @@ namespace Assets.Scripts.Player
             Status = new PlayerStatus();
             Body = gameObject.GetComponent<Rigidbody2D>();
 
+            GameModeLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
+
             AmmoHUD = new AmmoHUD(GameObject.Find(ObjectNames.Ammo_HUD).GetComponent<TextMeshProUGUI>());
             PointsHUD = new PointsHUD(GameObject.Find(ObjectNames.Points_HUD).GetComponent<TextMeshProUGUI>());
 
@@ -60,8 +64,14 @@ namespace Assets.Scripts.Player
 
             Weapons = new List<BaseWeapon>()
             {
-                GameObject.Find(ObjectNames.Pistol).GetComponent<PlayerPistol>().Weapon
+                GameObject.Find(ObjectNames.Pistol).GetComponent<BasePlayer>().Weapon
             };
+
+            if (GameModeLogic.GameMode == GameModeType.NonZombieMode)
+            {
+                Weapons.Add(GameObject.Find(ObjectNames.Rifle).GetComponent<BasePlayer>().Weapon);
+                Weapons.Reverse();
+            }
 
             GameOverScreen = new GameOverHUD()
             {

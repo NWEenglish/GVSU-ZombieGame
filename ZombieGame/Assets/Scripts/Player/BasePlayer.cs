@@ -11,7 +11,7 @@ namespace Assets.Scripts.Player
         protected abstract string PlayerWeaponObjectName { get; }
         protected abstract BaseWeapon GetWeapon(GameObject bullet, GameObject muzzle, AudioSource reloadSound, Sprite sprite);
 
-        private void Start()
+        private void Awake()
         {
             GameObject bullet = GameObject.Find(BulletObjectName);
             GameObject muzzle = gameObject;
