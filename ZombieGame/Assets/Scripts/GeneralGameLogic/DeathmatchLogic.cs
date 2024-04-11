@@ -263,7 +263,7 @@ namespace Assets.Scripts.GeneralGameLogic
             if (PlayerRespawnTimerMs < 0f)
             {
                 PlayerRespawnTimerMs = null;
-                SpawnerLogic spawner = GetRandomSpawner();
+                SpawnerLogic spawner = GetRandomSpawner(TeamType.PlayerTeam);
                 PlayerLogic.gameObject.transform.position = spawner.Position;
                 PlayerLogic.Enable();
 
@@ -280,14 +280,16 @@ namespace Assets.Scripts.GeneralGameLogic
         {
             for (int i = currentBots; i < maxBots; i++)
             {
-                SpawnerLogic spawner = GetRandomSpawner();
+                SpawnerLogic spawner = GetRandomSpawner(team);
                 GameObject bot = Spawn(spawner.transform.position, team);
                 UpdateBotLists(bot, team);
             }
         }
 
-        private SpawnerLogic GetRandomSpawner()
+        private SpawnerLogic GetRandomSpawner(TeamType team)
         {
+            float failSafeSpawnTimer = (float)TimeSpan.FromSeconds(5).TotalMilliseconds;
+
             // Pick Random Location
             SpawnerLogic retSpawner = null;
             while (retSpawner == null)
@@ -295,9 +297,15 @@ namespace Assets.Scripts.GeneralGameLogic
                 int randomValue = (int)((Random.value * 100) % Spawners.Count);
                 retSpawner = Spawners[randomValue];
 
-                if (!retSpawner.CanSpawn)
+                if (!retSpawner.CanSpawn(team))
                 {
                     retSpawner = null;
+                    failSafeSpawnTimer -= Time.deltaTime * 1000f;
+                }
+                // If we cannot find a safe spawner, the random one will have to do.
+                else if (failSafeSpawnTimer < 0f)
+                {
+                    break;
                 }
             }
 

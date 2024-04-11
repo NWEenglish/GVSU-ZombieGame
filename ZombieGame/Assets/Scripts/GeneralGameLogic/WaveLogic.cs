@@ -139,7 +139,7 @@ namespace Assets.Scripts.GeneralGameLogic
                 int randomValue = (int)((Random.value * 100) % Spawners.Count);
                 spawner = Spawners[randomValue];
 
-                if (!spawner.CanSpawn)
+                if (!spawner.CanSpawn())
                 {
                     spawner = null;
                 }
