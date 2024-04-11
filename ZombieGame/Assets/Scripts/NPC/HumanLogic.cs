@@ -13,10 +13,10 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.NPC
 {
-    public class FriendlyLogic : BaseNpcLogic, IHumanLogic
+    public class HumanLogic : BaseNpcLogic, IHumanLogic
     {
         public override TeamType Team => pTeam;
-        private TeamType pTeam = TeamType.PlayerTeam; // when spawning team mates / opponents
+        private TeamType pTeam = TeamType.PlayerTeam; // Default because of zombie mode
 
         protected override int Health { get; set; } = 100;
         protected override int HitPoints => 0;
@@ -41,11 +41,16 @@ namespace Assets.Scripts.NPC
         private DateTime LastChatterTime = DateTime.MinValue;
         private DateTime LastStoppedTime = DateTime.MinValue;
         private bool MustFollowPlayer;
+        private bool IsDisabled = false;
+        private bool IsEnabled => !IsDisabled;
         private List<Transform> PointsOfInterest;
 
-        public void InitValues(TeamType team)
+        public void InitValues(List<Transform> pointsOfInterest, TeamType team)
         {
+            PointsOfInterest = pointsOfInterest;
             pTeam = team;
+
+            this.InitValues();
         }
 
         private void Start()
@@ -75,65 +80,63 @@ namespace Assets.Scripts.NPC
 
             var gameLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
             MustFollowPlayer = gameLogic.GameMode == GameModeType.ZombieMode && this.Team == TeamType.PlayerTeam;
-
-            // Don't bother wasting memory if we're just going to follow the player around
-            if (!MustFollowPlayer)
-            {
-                PointsOfInterest = GameObject.Find(ObjectNames.PointsOfInterest).GetComponentsInChildren<Transform>()
-                    .Where(c => !c.name.StartsWith("Points"))
-                    .ToList();
-            }
         }
 
         private void Update()
         {
-            CheckIfDead();
-
-            var closestVisibleEnemy = NearbyTargets
-                .Where(t => Aim.IsVisible(t))
-                .OrderBy(t => Vector2.Distance(gameObject.transform.position, t.transform.position))
-                .FirstOrDefault();
-
-            // Aim at visible enemy
-            if (closestVisibleEnemy != null)
+            if (IsEnabled)
             {
-                LastStoppedTime = DateTime.Now;
+                CheckIfDead();
 
-                SetCurrentColor(isShooting: true);
-                RotateTowardsGameObject(closestVisibleEnemy);
-                AttemptToShoot();
-                AttemptCombatChatter();
-            }
-            else
-            {
-                SetCurrentColor(isShooting: false);
-            }
+                var closestVisibleEnemy = NearbyTargets
+                    .Where(t => Aim.IsVisible(t))
+                    .OrderBy(t => Vector2.Distance(gameObject.transform.position, t.transform.position))
+                    .FirstOrDefault();
 
-            // Check if needs reload
-            if (CurrentWeapon.RemainingClipAmmo == 0)
-            {
-                CurrentWeapon.Reload();
+                // Aim at visible enemy
+                if (closestVisibleEnemy != null)
+                {
+                    LastStoppedTime = DateTime.Now;
+
+                    SetCurrentColor(isShooting: true);
+                    RotateTowardsGameObject(closestVisibleEnemy);
+                    AttemptToShoot();
+                    AttemptCombatChatter();
+                }
+                else
+                {
+                    SetCurrentColor(isShooting: false);
+                }
+
+                // Check if needs reload
+                if (CurrentWeapon.RemainingClipAmmo == 0)
+                {
+                    CurrentWeapon.Reload();
+                }
             }
         }
 
         private void FixedUpdate()
         {
-            if (Target != null && DateTime.Now.Subtract(LastStoppedTime).TotalMilliseconds > MinTimeBetweenMovementMs)
+            if (IsEnabled)
             {
-                Agent.SetDestination(Target.position);
-                if (Agent.remainingDistance > Agent.stoppingDistance)
+                if (Target != null && DateTime.Now.Subtract(LastStoppedTime).TotalMilliseconds > MinTimeBetweenMovementMs)
                 {
-                    transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
-                    transform.rotation *= Quaternion.Euler(0f, 0f, 90);
+                    Agent.SetDestination(Target.position);
+                    if (Agent.remainingDistance > Agent.stoppingDistance)
+                    {
+                        transform.rotation = Quaternion.LookRotation(Vector3.forward, Agent.velocity.normalized);
+                        transform.rotation *= Quaternion.Euler(0f, 0f, 90);
+                    }
+                    else
+                    {
+                        LastStoppedTime = DateTime.Now;
+                    }
                 }
                 else
                 {
-                    LastStoppedTime = DateTime.Now;
+                    SetTarget();
                 }
-            }
-            else
-            {
-                SetTarget();
             }
         }
 
@@ -166,7 +169,7 @@ namespace Assets.Scripts.NPC
 
         private void AttemptCombatChatter()
         {
-            if (!Scream.isPlaying && !Chatter.Any(audio => audio.isPlaying))
+            if (Team == TeamType.PlayerTeam && !Scream.isPlaying && !Chatter.Any(audio => audio.isPlaying))
             {
                 // Time out completed and now checking for chance for bots to have chatter.
                 if (DateTime.Now.Subtract(LastChatterTime).TotalSeconds > MinTimeBetweenChatter
@@ -232,8 +235,19 @@ namespace Assets.Scripts.NPC
         {
             Health -= 15;
 
-            // Chance to scream when hit
-            if (!Scream.isPlaying && (int)((Random.value * 100) % 5) == 0)
+            AttemptScream();
+            SetCurrentColor(isShooting: false);
+
+            if (Health <= 0)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        private void AttemptScream()
+        {
+            // Chance to scream
+            if (Team == TeamType.PlayerTeam && !Scream.isPlaying && (int)((Random.value * 100) % 5) == 0)
             {
                 // Stop playing the other audio
                 foreach (var audioSource in Chatter)
@@ -243,34 +257,55 @@ namespace Assets.Scripts.NPC
 
                 Scream.TryPlay();
             }
-
-            SetCurrentColor(isShooting: false);
-
-            if (Health <= 0)
-            {
-                Destroy(gameObject);
-            }
         }
 
+        // Unity color reference: https://docs.unity3d.com/ScriptReference/Color.html
         private void SetCurrentColor(bool isShooting)
         {
-            // Per Unity: Color.Yellow RGBA is (1, 0.92, 0.016, 1)
-            float greenForYellowMix = 0.92f;
-            float blueForYellowMix = 0.016f;
+            Color color;
 
-            float colorRatio = Health / 100f;
-            float green = colorRatio;
-            float blue = colorRatio;
-
-            if (isShooting)
+            // Friendlies are "normal" color
+            if (Team == TeamType.PlayerTeam)
             {
-                green *= greenForYellowMix;
-                blue *= blueForYellowMix;
+                // Per Unity: Color.Yellow RGBA is (1, 0.92, 0.016, 1)
+                float greenForYellowMix = 0.92f;
+                float blueForYellowMix = 0.016f;
+
+                float colorRatio = Health / 100f;
+                float green = colorRatio;
+                float blue = colorRatio;
+
+                if (isShooting)
+                {
+                    green *= greenForYellowMix;
+                    blue *= blueForYellowMix;
+                }
+
+                color = new Color(1, green, blue);
+            }
+            else
+            {
+                // Per Unity: Color.Black RGBA is (0, 0, 0, 1)
+                color = new Color(0, 0, 0);
             }
 
-            // TODO - Add a red tint to enemies, green for allies
+            gameObject.GetComponent<SpriteRenderer>().color = color;
+        }
 
-            gameObject.GetComponent<SpriteRenderer>().color = new Color(1, green, blue);
+        protected override void TakeHit(int damage)
+        {
+            Health -= damage;
+            AttemptScream();
+        }
+
+        public void Disable()
+        {
+            IsDisabled = true;
+
+            if (Agent != null)
+            {
+                Agent.isStopped = true;
+            }
         }
     }
 }

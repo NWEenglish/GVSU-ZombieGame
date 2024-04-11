@@ -30,11 +30,14 @@ namespace Assets.Scripts
 
             PolygonCollider2D bulletCollider = gameObject.GetComponent<PolygonCollider2D>();
 
-            // Ignore bullet collision with player
-            PolygonCollider2D playerCollider = GameObject.Find(ObjectNames.Player)?.GetComponent<PolygonCollider2D>();
-            if (playerCollider != null)
+            // Ignore bullet collision with player if it's from the same team
+            if (TeamSource == TeamType.PlayerTeam)
             {
-                Physics2D.IgnoreCollision(playerCollider, bulletCollider);
+                PolygonCollider2D playerCollider = GameObject.Find(ObjectNames.Player)?.GetComponent<PolygonCollider2D>();
+                if (playerCollider != null)
+                {
+                    Physics2D.IgnoreCollision(playerCollider, bulletCollider);
+                }
             }
 
             // Ignore collision with allies
