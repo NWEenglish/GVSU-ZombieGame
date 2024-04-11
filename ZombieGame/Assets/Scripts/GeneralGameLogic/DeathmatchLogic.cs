@@ -24,7 +24,6 @@ namespace Assets.Scripts.GeneralGameLogic
         private int MaxBotsPerTeam => 5;
         private int TargetPoints => 7500;
         private int PointsPerKill => 100;
-        private double PlayerRespawnCounterSec => 2.5;
 
         private int MaxFriendlyBots => MaxBotsPerTeam - 1;
         private int MaxHostileBots => MaxBotsPerTeam;
