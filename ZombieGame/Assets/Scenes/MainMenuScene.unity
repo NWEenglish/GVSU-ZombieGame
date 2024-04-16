@@ -1740,8 +1740,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 17
+  m_fontSizeBase: 17
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2116,13 +2116,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: " And my wonderful testers:\n  Denver DeBoer\n  Chris English\n  Mike English\n 
-    Kevin Jaklic\n\nAudio: \n Alexandr Zhelanov  - Menu_4 \r\n AVGVSTA  - Remix of
-    Metaruka's \"The End\" \r\n copyc4t (Paolo D'Emilio)  - Day 1 \r\n EmoPreben 
-    - Zombie Moans 01 \r\n Gumichan01  - Laser shot\n JPolito (Josh Polito) - Starship
-    Troopers Voice Acting\n Machine  - Dark Loop\n Michel Baradari (Submitted by
-    qubodup)  - Shots \r\n OrbitStudios, Fernando Ferreira  - Zombie News \r\n Vinrax 
-    - Key Pickup 2 \r\n zer0_sol  - Reload \r\n Emma_MA - haunting piano\n RandomMind
-    - Rising_Moon\n nene - Short Theme"
+    Kevin Jaklic\n  Evan Parks\n\nAudio: \n Alexandr Zhelanov  - Menu_4 \r\n AVGVSTA 
+    - Remix of Metaruka's \"The End\" \r\n copyc4t (Paolo D'Emilio)  - Day 1 \r\n
+    EmoPreben  - Zombie Moans 01 \r\n Gumichan01  - Laser shot\n JPolito (Josh Polito)
+    - Starship Troopers Voice Acting\n Machine  - Dark Loop\n Michel Baradari (Submitted
+    by qubodup)  - Shots \r\n OrbitStudios, Fernando Ferreira  - Zombie News \r\n
+    Vinrax  - Key Pickup 2 \r\n zer0_sol  - Reload \r\n Emma_MA - haunting piano\n
+    RandomMind - Rising_Moon\n nene - Short Theme"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2149,8 +2149,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 17
+  m_fontSizeBase: 17
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
