@@ -176,5 +176,10 @@ namespace Assets.Scripts.NPC
 
             NextAudioTime = DateTime.Now.AddSeconds(randomValue);
         }
+
+        protected override void TakeHit(int damage)
+        {
+            Health -= damage;
+        }
     }
 }

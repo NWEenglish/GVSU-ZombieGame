@@ -26,9 +26,16 @@ namespace Assets.Scripts.NPC
             {
                 List<RaycastHit2D> hits = Physics2D.LinecastAll(StartPoint.position, otherGameObject.transform.position).ToList();
 
-                // Filter out everything but walls and the target ovject
-                RaycastHit2D firstApplicableHit = hits.FirstOrDefault(hit => hit.collider?.gameObject?.tag == TagNames.Wall || hit.collider?.gameObject == otherGameObject);
-                retWasHit = firstApplicableHit.collider?.gameObject == otherGameObject;
+                // If we see a wall, we must not of seen the target
+                if (hits.Any(hit => hit.collider?.gameObject?.tag == TagNames.Wall))
+                {
+                    retWasHit = false;
+                }
+                else
+                {
+                    RaycastHit2D firstApplicableHit = hits.FirstOrDefault(hit => hit.collider?.gameObject == otherGameObject);
+                    retWasHit = firstApplicableHit.collider?.gameObject == otherGameObject;
+                }
             }
 
             return retWasHit;

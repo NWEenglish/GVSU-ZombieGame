@@ -3,6 +3,7 @@
     public enum TeamType
     {
         PlayerTeam,
+        HostileTeam,
         ZombieTeam
     }
 }

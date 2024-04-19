@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Constants.Names;
@@ -31,6 +32,10 @@ namespace Assets.Scripts.Player
         private HealthHUD HealthHUD;
         private PointsHUD PointsHUD;
         private GameOverHUD GameOverScreen;
+        private BaseGameModeLogic GameModeLogic;
+
+        private bool IsDisabled = false;
+        private bool IsEnabled => !IsDisabled;
 
         private const float PlayerWalkingSpeed = 5f;
         private const float PlayerSprintSpeed = PlayerWalkingSpeed * 2;
@@ -52,45 +57,76 @@ namespace Assets.Scripts.Player
             Status = new PlayerStatus();
             Body = gameObject.GetComponent<Rigidbody2D>();
 
+            GameModeLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
+
             AmmoHUD = new AmmoHUD(GameObject.Find(ObjectNames.Ammo_HUD).GetComponent<TextMeshProUGUI>());
-            PointsHUD = new PointsHUD(GameObject.Find(ObjectNames.Points_HUD).GetComponent<TextMeshProUGUI>());
 
             var healthBlink = new BlinkHelper(GameObject.Find(ObjectNames.Health_Indicator_HUD).GetComponent<Image>(), Color.red, HealthBlinkTime);
             HealthHUD = new HealthHUD(GameObject.Find(ObjectNames.Health_Panel_HUD).GetComponent<Image>(), healthBlink, Status.MaxHealth);
 
             Weapons = new List<BaseWeapon>()
             {
-                GameObject.Find(ObjectNames.Pistol).GetComponent<PlayerPistol>().Weapon
+                GameObject.Find(ObjectNames.Pistol).GetComponent<BasePlayer>().Weapon
             };
 
             GameOverScreen = new GameOverHUD()
             {
                 GameOverTitle = GameObject.Find(ObjectNames.GameOver_Title).GetComponent<TextMeshProUGUI>(),
-                GameOverWave = GameObject.Find(ObjectNames.GameOver_Subtext).GetComponent<TextMeshProUGUI>()
+                GameOverSubtext = GameObject.Find(ObjectNames.GameOver_Subtext).GetComponent<TextMeshProUGUI>()
             };
+
+            ZombieModeSetup();
+            NonZombieModeSetup();
 
             CurrentWeapon = Weapons.First();
             Equip();
         }
 
+        private void ZombieModeSetup()
+        {
+            if (GameModeLogic.GameMode == GameModeType.ZombieMode)
+            {
+                PointsHUD = new PointsHUD(GameObject.Find(ObjectNames.Points_HUD).GetComponent<TextMeshProUGUI>());
+            }
+        }
+
+        private void NonZombieModeSetup()
+        {
+            if (GameModeLogic.GameMode == GameModeType.NonZombieMode)
+            {
+                Weapons.Add(GameObject.Find(ObjectNames.Rifle).GetComponent<BasePlayer>().Weapon);
+                Weapons.Reverse();
+            }
+        }
+
         private void FixedUpdate()
         {
-            Move();
-            Rotate();
+            if (IsEnabled)
+            {
+                Move();
+                Rotate();
+            }
         }
 
         private void Update()
         {
-            PurchaseWeapons();
-            PurchaseSupport();
-            SwitchWeapons();
-            ShootUpdate();
-            ReloadLogic();
+            if (IsEnabled)
+            {
+                PurchaseWeapons();
+                PurchaseSupport();
+                SwitchWeapons();
+                ShootUpdate();
+                ReloadLogic();
 
-            Status.Update(IsMoving, IsSprinting);
-            AmmoHUD.UpdateHUD(CurrentWeapon.RemainingClipAmmo, CurrentWeapon.RemainingTotalAmmo);
-            HealthHUD.UpdateHUD(Status.Health);
-            PointsHUD.UpdateHUD(Status.Points);
+                Status.Update(IsMoving, IsSprinting);
+                AmmoHUD.UpdateHUD(CurrentWeapon.RemainingClipAmmo, CurrentWeapon.RemainingTotalAmmo);
+                HealthHUD.UpdateHUD(Status.Health);
+
+                if (PointsHUD != null)
+                {
+                    PointsHUD.UpdateHUD(Status.Points);
+                }
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -123,15 +159,37 @@ namespace Assets.Scripts.Player
             }
         }
 
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.TryGetComponent(out BulletLogic bulletLogic))
+            {
+                Status.TakeBulletHit(bulletLogic.Damage);
+                HandleDamage();
+            }
+        }
+
+        // Mainly used for if a zombie attacks the player
         public void Hit()
         {
-            Status.TakeHit();
+            Status.TakeZombieHit();
+            HandleDamage();
+        }
 
+        private void HandleDamage()
+        {
             if (Status.Health <= 0)
             {
                 _logger.LogDebug($"Player has died. | PlayerHealth: {Status.Health}");
-                Destroy(gameObject);
-                GameOverScreen.ShowGameOver(GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Wave);
+
+                if (GameModeLogic.GameMode == GameModeType.ZombieMode)
+                {
+                    Destroy(gameObject);
+                    GameOverScreen.ShowZombiesGameOver(GameObject.Find(ObjectNames.GameLogic).GetComponent<WaveLogic>().Wave);
+                }
+                else
+                {
+                    _logger.LogDebug("Player is dead, but is allowed to respawning.");
+                }
             }
 
             HealthHUD.DisplayHit();
@@ -223,12 +281,12 @@ namespace Assets.Scripts.Player
             if (Input.GetMouseButton(0) && CurrentWeapon.FireType == FireType.FullyAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
-                CurrentWeapon.Shoot(bulletTargetAngle);
+                CurrentWeapon.Shoot(bulletTargetAngle, TeamType.PlayerTeam);
             }
             else if (Input.GetMouseButtonDown(0) && CurrentWeapon.FireType == FireType.SemiAutomatic)
             {
                 float bulletTargetAngle = Body.rotation;
-                CurrentWeapon.Shoot(bulletTargetAngle);
+                CurrentWeapon.Shoot(bulletTargetAngle, TeamType.PlayerTeam);
             }
         }
 
@@ -256,6 +314,27 @@ namespace Assets.Scripts.Player
             CurrentWeapon.Equip(gameObject);
             Destroy(gameObject.GetComponent<PolygonCollider2D>());
             gameObject.AddComponent<PolygonCollider2D>();
+        }
+
+        public void Disable()
+        {
+            IsDisabled = true;
+            Body.velocity = new Vector2(0, 0);
+        }
+
+        public void Enable()
+        {
+            IsDisabled = false;
+        }
+
+        public void ResetPlayer()
+        {
+            Status.Reset();
+
+            foreach (BaseWeapon weapon in Weapons)
+            {
+                weapon.Reset();
+            }
         }
     }
 }

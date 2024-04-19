@@ -12,13 +12,15 @@ namespace Assets.Scripts
     public class BulletLogic : MonoBehaviour
     {
         public int Damage { get; private set; }
+        public TeamType TeamSource { get; private set; }
 
         private bool HasCollided = false;
         private AudioSource Audio;
 
-        public void InitValues(int damage)
+        public void InitValues(int damage, TeamType teamSource)
         {
             Damage = damage;
+            TeamSource = teamSource;
         }
 
         private void Start()
@@ -28,17 +30,20 @@ namespace Assets.Scripts
 
             PolygonCollider2D bulletCollider = gameObject.GetComponent<PolygonCollider2D>();
 
-            // Ignore bullet collision with player
-            PolygonCollider2D playerCollider = GameObject.Find(ObjectNames.Player)?.GetComponent<PolygonCollider2D>();
-            if (playerCollider != null)
+            // Ignore bullet collision with player if it's from the same team
+            if (TeamSource == TeamType.PlayerTeam)
             {
-                Physics2D.IgnoreCollision(playerCollider, bulletCollider);
+                PolygonCollider2D playerCollider = GameObject.Find(ObjectNames.Player)?.GetComponent<PolygonCollider2D>();
+                if (playerCollider != null)
+                {
+                    Physics2D.IgnoreCollision(playerCollider, bulletCollider);
+                }
             }
 
             // Ignore collision with allies
             List<PolygonCollider2D> allyColliders = GameObject.FindGameObjectsWithTag(TagNames.NPC)
                 .Select(npc => npc.GetComponent<BaseNpcLogic>())
-                .Where(npc => npc.Team == TeamType.PlayerTeam)
+                .Where(npc => npc.Team == TeamSource)
                 .Select(npc => npc.GetComponent<PolygonCollider2D>())
                 .ToList();
 

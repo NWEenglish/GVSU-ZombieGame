@@ -1,5 +1,8 @@
 ﻿using System.Linq;
+using Assets.Scripts.Constants.Names;
 using Assets.Scripts.Constants.Types;
+using Assets.Scripts.Extensions;
+using Assets.Scripts.GeneralGameLogic;
 using Assets.Scripts.Player;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,11 +11,11 @@ namespace Assets.Scripts.NPC
 {
     public abstract class BaseNpcLogic : MonoBehaviour
     {
-
         public abstract TeamType Team { get; }
 
         [SerializeField] protected Transform Target;
         protected NavMeshAgent Agent;
+        protected BaseGameModeLogic GameModeLogic;
         protected bool ShouldMute = true;
         protected bool ShouldMove = false;
 
@@ -20,6 +23,8 @@ namespace Assets.Scripts.NPC
         protected abstract int HitPoints { get; }
         protected abstract int KillPoints { get; }
         protected abstract float CurrentSpeed { get; set; }
+
+        protected abstract void TakeHit(int damage);
 
         public void InitValues()
         {
@@ -33,6 +38,8 @@ namespace Assets.Scripts.NPC
             Agent.updateRotation = false;
             Agent.updateUpAxis = false;
             Agent.speed = ShouldMove ? CurrentSpeed : 0f;
+
+            GameModeLogic = GameObject.Find(ObjectNames.GameLogic).GetComponent<BaseGameModeLogic>();
         }
 
         protected void UpdateClosestTarget()
@@ -63,6 +70,14 @@ namespace Assets.Scripts.NPC
             if (Health <= 0)
             {
                 Destroy(gameObject);
+            }
+        }
+
+        protected void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.HasComponent<BulletLogic>())
+            {
+                TakeHit(collision.gameObject.GetComponent<BulletLogic>().Damage);
             }
         }
     }

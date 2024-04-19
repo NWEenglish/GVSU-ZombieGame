@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Constants.Names;
+using Assets.Scripts.Constants.Types;
 using Assets.Scripts.Weapons;
 using NUnit.Framework;
 using UnityEngine;
@@ -30,7 +31,7 @@ namespace Assets.Editor.Weapons
             {
                 // Wait until the weapon can be shot again
                 while (!weapon.CanShoot()) { }
-                weapon.Shoot(angle: 0);
+                weapon.Shoot(angle: 0, teamSource: TeamType.PlayerTeam);
             }
 
             weapon.Reload();
